@@ -1,0 +1,32 @@
+body{
+  background-color: rgb(56, 52, 53);
+    color: white;
+}
+
+.menu{
+  background-color: rgb(56, 52, 53);
+  border: 1px solid #d5d2d2;
+  height: 50px;
+  position: sticky;
+  top :0px;/* 上端から10pxのところで固定 */
+}
+
+.share{
+  background-color: transparent;/*背景透明*/
+  border-radius: 5px;
+  border: 1px solid #d5d2d2;
+}
+.memo {
+  display: inline-block;/*テキストに合わせてサイズを変更*/
+  max-width: 200px;/*inline-blockで広がる最大サイズ*/
+  max-height: 400px;/*inline-blockで広がる最大サイズ*/
+  margin: 5px;
+  padding: 5px;
+  
+}
+.add_memo{
+  width: 500px;
+  height: 30px;
+  padding: 5px;
+  margin: 20px auto;
+}
