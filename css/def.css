@@ -26,7 +26,17 @@ body{
 }
 .add_memo{
   width: 500px;
-  height: 30px;
+  height: 150px;
   padding: 5px;
   margin: 20px auto;
+}
+input{
+  width: 95%;
+  height: 20px;
+  display: block;
+  padding: 1px 0px;
+  margin: 0px auto;
+}
+input.content{
+  height: 50px;
 }

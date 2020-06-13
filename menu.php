@@ -1,3 +1,17 @@
+<?php
+require_once 'DBManager.php';
+try {
+  $db = getDb();
+  $stt = $db->prepare('SELECT * FROM memo');
+  $stt->execute();
+  while($row=$stt->fetch(PDO::FETCH_ASSOC)){
+    $res[]=$row;
+  }
+} catch(PDOException $e) {
+  print "エラーメッセージ：{$e->getMessage()}";
+}
+
+?>
 <!DOCTYPE html>
 <html lang="ja" >
   <head>
@@ -14,94 +28,21 @@
       メニュー
     </div>
     <div class="add_memo share">
-      <input type="text" size="50" name="" value=""><br>
-      <input type="text" size="50" name="" value="">
+      <input type="text" name="title" value="タイトル" /><br>
+      <input type="text" class="content" name="content" value="メモを入力...">
+      
     </div>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
-    <div class="memo share" >
-      <p class="title">タイトル</p>
-      <p class="content">内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容内容</p>
-    </div>
+    <?php
+    foreach ($res as $value) {
+      $msg=<<<EOD
+       <div class="memo share" >
+          <p class="title">{$value['title']}</p>
+          <p class="content">{$value['contents']}</p>
+        </div>
+EOD;
+      print $msg;
+    }
+    ?>
 
   </body>
 </html>
