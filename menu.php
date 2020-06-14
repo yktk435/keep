@@ -27,22 +27,35 @@ try {
     <div class="menu">
       メニュー
     </div>
-    <div class="add_memo share">
-      <input type="text" name="title" value="タイトル" /><br>
-      <input type="text" class="content" name="content" value="メモを入力...">
+    <!-- メモ追加 -->
+    <div  id="create" class="add_memo share" datetime="" label="" user_id="" color_id=""> 
+      <textarea class="textArea" placeholder="タイトル" cols="" rows="" wrap="soft" onblur="focusOut(this)" onfocus="focusOn(this)"></textarea>
       
+      <textarea class="textArea" placeholder="内容" cols="" rows="" wrap="soft" onblur="focusOut(this)" onfocus="focusOn(this)"></textarea> 
+
     </div>
+    <!-- メモ -->
+    <div class="memo_area">
     <?php
-    foreach ($res as $value) {
-      $msg=<<<EOD
-       <div class="memo share" >
-          <p class="title">{$value['title']}</p>
-          <p class="content">{$value['contents']}</p>
+    if($res){
+      foreach ($res as $value) {
+        $msg=<<<EOD
+         <div class="memo share" id="{$value['id']}"  datetime="{$value['datetime']}"         label="{$value['label']}" user_id="{$value['user_id']}" color_id="{$value['color_id']}">
+           <textarea class="textArea" placeholder="タイトル" cols="" rows="" wrap="soft" onblur="focusOut(this)" onfocus="focusOn(this)">{$value['title']}</textarea>
+           
+           <textarea class="textArea" placeholder="内容" cols="" rows="" wrap="soft" onblur="focusOut(this)" onfocus="focusOn(this)">{$value['contents']}</textarea> 
+           <div class="">
+             <button type="button" name="button" onclick=remove(this)>削除</button>
+             
+           </div>
+
         </div>
-EOD;
-      print $msg;
+        EOD;
+        print $msg;
+      }      
     }
     ?>
+    </div>
 
   </body>
 </html>
