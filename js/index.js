@@ -1,47 +1,52 @@
 'use strict';
 let url = 'http://localhost:8888/keep/processingData.php';
+let edditId='';
+document.addEventListener("DOMContentLoaded", function(){
+  document.body.addEventListener('click',(e)=>{
+    save(edditId);
+  })
+})
 
-
-//post送信
-function postData(url, key, data) {
-  let xhr = new XMLHttpRequest();
-  xhr.open('POST', url)
-  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-  xhr.send('&' + key + '=' + JSON.stringify(data));
-  xhr.onreadystatechange = function() {
-    if (xhr.readyState === 4 && xhr.status === 200) {
-      console.log(xhr.responseText)
-      return xhr.responseText;
-    }
-  }
-}
 
 //入力項目からフフーカスアウトしたら更新情報を送信
 function focusOut(obj) {
-  let now = new Date();
-  let parent = obj.parentNode
+  let id=obj.parentNode.id;
+  edditId=id;
+}
 
-  let id = parent.id;
+//textareaにフォーカスしたら
+function focusOn(obj) {
+  let id=obj.parentNode.id;
+  if(edditId!=id && edditId!=0){
+    save(edditId);
+    edditId=id;
+  }
+}
+
+function save(edditId){
+  let parent=document.getElementById(edditId);
+  let now = new Date();
   let title = parent.children[0].value;
   let contents = parent.children[1].value;
   let datetime = getDatetime(now);
   let label = parent.getAttribute('label') ;
   let color_id = parent.getAttribute('color_id');
   let user_id = parent.getAttribute('user_id');
-  
-  if(id=='create'){
+  let data = {
+    'id': edditId,
+    'title': title,
+    'contents': contents,
+    'datetime': datetime,
+    'label':label,
+    'color_id':color_id,
+    'user_id': user_id,
+  }
+
+  if(edditId=='create'){
     console.log('create');
     if(!(title=='' && contents=='')){
       let insert=document.querySelector('.memo_area');
-      let data = {
-        
-        'title': title,
-        'contents': contents,
-        'datetime': datetime,
-        'label':label,
-        'color_id':color_id,
-        'user_id': user_id,
-      }
+      delete data.id;
       let id=postData(url, 'create', data);          
       let template=`
       <div class="memo share" id="${id}"  datetime="${datetime}" label="${label}" user_id="${user_id}" color_id="${color_id}">
@@ -57,26 +62,27 @@ function focusOut(obj) {
       `;
       insert.innerHTML+=template;
       parent.children[0].value='';
-      parent.children[0].value='';
+      parent.children[1].value='';
 
     }
   }else{  
-    let data = {
-      'id': id,
-      'title': title,
-      'contents': contents,
-      'datetime': datetime,
-      'label':label,
-      'color_id':color_id,
-      'user_id': user_id,
-    }
     postData(url, 'update', data);    
   }
+
 }
 
-//textareaにフォーカスしたら
-function focusOn(obj) {
-  console.log(obj);
+//post送信
+function postData(url, key, data) {
+  let xhr = new XMLHttpRequest();
+  xhr.open('POST', url)
+  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+  xhr.send('&' + key + '=' + JSON.stringify(data));
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      //console.log("response=="+xhr.responseText)
+      return xhr.responseText;
+    }
+  }
 }
 
 function getDatetime(now) {

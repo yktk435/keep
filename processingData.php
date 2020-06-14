@@ -4,15 +4,14 @@ require_once 'DBManager.php';
 try {
   $db = getDb();
   if($_POST['update']){
-    $data=json_decode($_POST['update'],true);//第2をtrueにしないと$dataが連想配列にならない
+    $data=json_decode($_POST['update'],true);//第2引数をtrueにしないと$dataが連想配列にならない
     update($db,$data);
   }elseif ($_POST['remove']) {
-    $data=json_decode($_POST['remove'],true);//第2をtrueにしないと$dataが連想配列にならない
+    $data=json_decode($_POST['remove'],true);//第2引数をtrueにしないと$dataが連想配列にならない
     remove($db,$data);
   }elseif ($_POST['create']) {
-    $data=json_decode($_POST['create'],true);//第2をtrueにしないと$dataが連想配列にならない
+    $data=json_decode($_POST['create'],true);//第2引数をtrueにしないと$dataが連想配列にならない
     create($db,$data);
-    print $db->lastInsertId();
   }
 } catch(PDOException $e) {
   print "エラーメッセージ：{$e->getMessage()}";
