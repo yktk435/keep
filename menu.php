@@ -2,7 +2,7 @@
 require_once 'DBManager.php';
 try {
   $db = getDb();
-  $stt = $db->prepare('SELECT * FROM memo');
+  $stt = $db->prepare('SELECT * FROM memo ORDER BY id DESC');
   $stt->execute();
   while($row=$stt->fetch(PDO::FETCH_ASSOC)){
     $res[]=$row;
@@ -54,8 +54,13 @@ try {
         </div>
         EOD;
         print $msg;
-      }      
+        
+      }
+      print "<dialog>".$value['id']."</dialog>";   
+    }else{
+      print "<dialog>".$db->lastInsertId()."</dialog>";   
     }
+    
     ?>
     
 </div>
