@@ -12,6 +12,7 @@ try {
   }elseif ($_POST['create']) {
     $data=json_decode($_POST['create'],true);//第2引数をtrueにしないと$dataが連想配列にならない
     create($db,$data);
+    print $db->lastInsertId();
   }
 } catch(PDOException $e) {
   print "エラーメッセージ：{$e->getMessage()}";
@@ -51,6 +52,7 @@ function create($db,$data){
   $stt->bindValue(':color_id', (int)$data['color_id']);
   $stt->bindValue(':user_id', (int)$data['user_id']);
   $stt->execute();
+  
 
 }
 

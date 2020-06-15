@@ -24,6 +24,8 @@ try {
     </script>
   </head>
   <body>
+    
+  
     <div class="menu">
       メニュー
     </div>
@@ -40,7 +42,7 @@ try {
     if($res){
       foreach ($res as $value) {
         $msg=<<<EOD
-         <div class="memo share" id="{$value['id']}"  datetime="{$value['datetime']}"         label="{$value['label']}" user_id="{$value['user_id']}" color_id="{$value['color_id']}">
+         <div class="memo share" id="id_{$value['id']}"  datetime="{$value['datetime']}"         label="{$value['label']}" user_id="{$value['user_id']}" color_id="{$value['color_id']}">
            <textarea class="textArea" placeholder="タイトル" cols="" rows="" wrap="soft" onblur="focusOut(this)" onfocus="focusOn(this)">{$value['title']}</textarea>
            
            <textarea class="textArea" placeholder="内容" cols="" rows="" wrap="soft" onblur="focusOut(this)" onfocus="focusOn(this)">{$value['contents']}</textarea> 
@@ -55,7 +57,7 @@ try {
       }      
     }
     ?>
-    </div>
-
+    
+</div>
   </body>
 </html>
