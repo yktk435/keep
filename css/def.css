@@ -7,8 +7,19 @@ body{
   background-color: rgb(56, 52, 53);
   border: 1px solid #d5d2d2;
   height: 50px;
+  width: 100%;
   position: sticky;
   top :0px;/* 上端から10pxのところで固定 */
+}
+.cansell{
+  background-color: rgb(56, 52, 53);
+  border: 1px solid #d5d2d2;
+  height: 30px;
+  width: 250px;
+  position: fixed;
+  top: 90%;
+  left: 5%;
+  
 }
 
 .share{
@@ -25,18 +36,44 @@ body{
   
 }
 .add_memo{
-  width: 500px;
-  height: 150px;
+  max-width: 500px;
   padding: 5px;
   margin: 20px auto;
 }
-input{
-  width: 95%;
-  height: 20px;
+
+/* --- INPUT=TEXTの標準デザイン設定 ---------------------*/
+.textArea {
+  
   display: block;
-  padding: 1px 0px;
-  margin: 0px auto;
+ width         : 90%;               /* 入力域の最大幅 */
+ max-height: 20px;
+ background    : rgb(56, 52, 53);             /* 入力域の背景色 */
+ border        : 1px solid rgba(250, 250, 250, 0.1);   /* 入力域の枠線   */
+ border-radius : 4px;                 /* 入力域の角丸   */
+ padding       : 8px;                /* 入力文字の余白 */
+ font-size     : 16px;                /* 入力文字サイズ */
+ color         : white;             /* 入力文字の色   */
+ font-weight   : bold;                /* 入力文字の太字 */
+ letter-spacing: .1em;                /* 入力文字の間隔 */
+ line-height   : 19px;                /* 入力文字の間隔 */
+ overflow:scroll;
+ margin: 5px auto;
 }
-input.content{
-  height: 50px;
+/* --- 入力フィールドにフォーカスか来たら ----------------*/
+.textArea:focus {
+ border-color  : white;                 /* 枠線色     */
+ background    : rgba(78, 76, 76, 1);  /* 背景色     */
+ outline       : 0;
+}
+/* --- 入力説明の文字(標準) -----------------------------*/
+.textArea:placeholder-shown {
+ color         :rgba(255, 255, 255, 0.44) ;                 /* 文字色     */
+}
+/* --- 入力説明の文字(Chrome,Safari,Android,iOS等) ---- -*/
+.textArea::-webkit-input-placeholder {
+ color         : rgba(255, 255, 255, 0.44);                 /* 文字色     */
+}
+/* --- 入力説明の文字(IE用) -----------------------------*/
+.textArea:-ms-input-placeholder {
+ color         : rgba(255, 255, 255, 0.44);                 /* 文字色     */
 }
