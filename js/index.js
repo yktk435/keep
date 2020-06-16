@@ -1,7 +1,7 @@
 'use strict';
 
 let url = 'http://localhost:8888/keep/processingData.php';
-let edditId = '';//現在編集中のメモID
+let edditId = ''; //現在編集中のメモID
 let removeCansellData = {
   'id': '',
   'title': '',
@@ -23,20 +23,20 @@ document.addEventListener('click', (e) => { //新規メモ追加の際、外側�
 })
 
 
-function focusOut(obj) {//textareaからフォーカスアウトしたら
+function focusOut(obj) { //textareaからフォーカスアウトしたら
   //console.log('フォーカスアウト=' + edditId)
-  let id = obj.parentNode.id;//メモID取得
+  let id = obj.parentNode.id; //メモID取得
   edditId = id;
 }
 
 
-function focusOn(obj) {//textareaにフォーカスしたら
+function focusOn(obj) { //textareaにフォーカスしたら
   //console.log('フォーカス=' + edditId)
-  let id = obj.parentNode.id;//メモID取得
-  if (edditId != id && edditId != '') {//edditIdが異なり且つ空でない場合、保存する
+  let id = obj.parentNode.id; //メモID取得
+  if (edditId != id && edditId != '') { //edditIdが異なり且つ空でない場合、保存する
     save(edditId);
     edditId = id;
-  } 
+  }
 }
 
 function save(edditId) {
@@ -53,7 +53,7 @@ function save(edditId) {
   // let label = parent.getAttribute('label');
   // let color_id = parent.getAttribute('color_id');
   // let user_id = parent.getAttribute('user_id');
-  let data = {//データベースへ送信する値
+  let data = { //データベースへ送信する値
     'id': toId(edditId),
     'title': parent.children[0].value,
     'contents': parent.children[1].value,
@@ -65,16 +65,16 @@ function save(edditId) {
   if (edditId == 'create') { //新規メモ追加時
     console.log('create')
 
-    if (data.title != '' || data.contents != '') {//どちらかに記入されていれば
-      let lastAutoIncrementId = Number(document.querySelector('dialog').innerText);//直近の自動連番を取得
+    if (data.title != '' || data.contents != '') { //どちらかに記入されていれば
+      let lastAutoIncrementId = Number(document.querySelector('dialog').innerText); //直近の自動連番を取得
       //console.log(lastAutoIncrementId)
-      let autoIncrementId = lastAutoIncrementId + 1; 
-      data.id=autoIncrementId;
-      
-      createEl(data);//新規メモをメモ一覧に表示
+      let autoIncrementId = lastAutoIncrementId + 1;
+      data.id = autoIncrementId;
+
+      createEl(data); //新規メモをメモ一覧に表示
       delete data.id;
       postData(url, 'create', data);
-      
+
       parent.children[0].value = '';
       parent.children[1].value = '';
     }
@@ -84,11 +84,11 @@ function save(edditId) {
   console.log('save 終わり')
 }
 
-function createEl(data){//新規メモをメモ一覧に表示
-  let parentNode=document.querySelector('.memo_area');
+function createEl(data) { //新規メモをメモ一覧に表示
+  let parentNode = document.querySelector('.memo_area');
   let newNode = document.createElement('div');
-  let referenceNode=document.querySelector('.memo');
-  
+  let referenceNode = document.querySelector('.memo');
+
   newNode.id = "id_" + data.id;
   newNode.className = 'memo share';
   newNode.setAttribute('datetime', data.datetime);
@@ -107,13 +107,13 @@ function createEl(data){//新規メモをメモ一覧に表示
   newNode.innerHTML = template;
   parentNode.insertBefore(newNode, referenceNode);
 
-  
+
 }
 
 function remove(obj) {
   console.log('remove');
   let parent = obj.parentNode.parentNode;
-  let memoArea=document.querySelector('.memo_area');
+  let memoArea = document.querySelector('.memo_area');
   let id = toId(parent.id);
   let data = {
     'id': id
@@ -121,8 +121,8 @@ function remove(obj) {
   removeCansellData.id = id;
   removeCansellData.title = parent.children[0].value;
   removeCansellData.contents = parent.children[1].value;
-  removeCansellData.HTML = memoArea.innerHTML;//今のメモ状況を一時保存
-  removeCansellData.timeoutId = setTimeout(() => {//5秒後にデータベースから消去
+  removeCansellData.HTML = memoArea.innerHTML; //今のメモ状況を一時保存
+  removeCansellData.timeoutId = setTimeout(() => { //5秒後にデータベースから消去
     postData(url, 'remove', data)
   }, 5000);
   parent.remove();
@@ -132,23 +132,23 @@ function remove(obj) {
   newNode.className = 'cansell';
   newNode.innerHTML = '<button type="button" name="button" onclick=removeCansell(this)>戻す</button>';
   document.body.appendChild(el)
-  
-  setTimeout(function(){//5秒後に要素を消す
+
+  setTimeout(function() { //5秒後に要素を消す
     document.querySelector('div.cansell').remove();
     clearTimeout(removeCansellData.timeoutId);
-  },5000);
+  }, 5000);
 }
 
 function removeCansell(obj) {
   //console.log('removeCansell');
-  
+
   //もとに戻す
   document.querySelector('.memo_area').innerHTML = removeCansellData.HTML;
   let target = document.querySelector('#id_' + removeCansellData.id);
   // console.log(removeCansellData);
   // console.log(target);
   clearTimeout(removeCansellData.timeoutId);
-  
+
   //削除前のタイトルと内容を反映
   target.children[0].innerText = removeCansellData.title;
   target.children[1].innerText = removeCansellData.contents;
