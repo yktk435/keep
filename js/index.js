@@ -22,28 +22,22 @@ let setTimeoutId;
 /*******************************************/
 function keyUp(obj) {
   console.log('▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽  keyUp  ▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽')
-
-  let target = obj.parentNode;
   let id = obj.parentNode.id
   if (setTimeoutId) {
     clearTimeout(setTimeoutId);
   }
-  if (id == CREATE) { //新規メモ作成・更新
-    if (FLAG) { //新規メモの要素を非表示で作成しているならDBへの更新と非表示になっている要素への反映
-      
-      setTimeoutId = setTimeout(() => {//新規メモ更新
-        updateNewMemo();
-      }, 500);
-    } else { //新規メモ作成
-      setTimeoutId = setTimeout(() => {
-        postData(url, CREATE, idToData(CREATE));
-      }, 500);
+  setTimeoutId = setTimeout(() => {
+    if (id == CREATE) { //新規メモ作成・更新
+      if (FLAG) { //新規メモの要素を非表示で作成しているならDBへの更新と非表示になっている要素への反映
+        //新規メモ更新
+          updateNewMemo();
+      } else { //新規メモ作成
+          postData(url, CREATE, idToData(CREATE));
+      }
+    } else {//メモ更新
+      postData(url, 'update', idToData(toId(id)));
     }
-  } else {//メモ更新
-    setTimeoutId = setTimeout(() => {
-      update(toId(id));
-    }, 500);
-  }
+  },500);
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  keyUp終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
 }
 document.addEventListener('click', (e) => { //新規メモ追加の際、外側をクリックしたら保存
@@ -70,13 +64,8 @@ function updateNewMemo() { //
   let data = {}
   let target = document.getElementById(CREATE)
   //DB送信用データの作成
+  data=idToData(CREATE);
   data.id = createdId;
-  data.title = target.children[0].innerText;
-  data.contents = target.children[1].innerText;
-  data.datetime = getDatetime(new Date());
-  data.label = target.getAttribute('label');
-  data.color_id = target.getAttribute('color_id');
-  data.user_id = target.getAttribute('user_id');
 
   postData(url, 'update', data);
 
@@ -88,7 +77,6 @@ function updateNewMemo() { //
   newMemoData.newNode.setAttribute('label', target.getAttribute('label'));
   newMemoData.newNode.setAttribute('color_id', target.getAttribute('color_id'));
   newMemoData.newNode.setAttribute('user_id', target.getAttribute('user_id'));
-
 }
 /*******************************************/
 //新規メモ要素作成
@@ -99,7 +87,7 @@ function createEl(id) {
   let referenceNode = document.querySelector('.memo');
   let target = document.getElementById(CREATE);
 
-  newMemoData.newNode.id = "#id_" + id;
+  newMemoData.newNode.id = "id_" + id;
   newMemoData.newNode.className = newMemoData.className;
   newMemoData.newNode.style.display = "none";
   newMemoData.newNode.setAttribute('datetime', newMemoData.datetime);
@@ -139,12 +127,6 @@ function createEl(id) {
   FLAG = 1;
 }
 /*******************************************/
-//既存メモ更新
-/*******************************************/
-function update(id) {
-  postData(url, 'update', idToData(id));
-}
-/*******************************************/
 //メモ削除
 /*******************************************/
 function remove(obj) {
@@ -168,7 +150,7 @@ function remove(obj) {
   setTimeout(() => { //消去キャンセル通知を5秒後に消す
     document.querySelector('div.cancel').remove();
     clearTimeout(recoveryMemoData.setTimeoutId);
-  }, 5000);
+  }, 3000);
 }
 /*******************************************/
 //消去キャンセル
@@ -199,7 +181,6 @@ function postData(url, key, data) {
       res = JSON.parse(xhr.responseText);
       if (key == CREATE) {
         createdId = res.data;
-        console.log('res=' + createdId)
         createEl(res.data);
       }
     }
@@ -249,16 +230,15 @@ function changeColor(obj) {
   let color_id = obj.id
   let id = obj.parentNode.id;
   let target;
-
   if (id == CREATE) {
-    target = document.querySelector('#create');
+    target = document.getElementById(CREATE);
     target.setAttribute('color_id', color_id)
     updateNewMemo()
   } else {
     target = document.querySelector('div#' + id);
     console.log(target)
     target.setAttribute('color_id', color_id)
-    update(id)
+    postData(url, 'update', idToData(toId(id)));
   }
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  changeColor終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
 }
