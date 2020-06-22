@@ -1,15 +1,10 @@
 'use strict';
-//////////////////////////////////////////////////////
+
 const CREATE = 'create';
-
-let FLAG = 0;//1:新規メモ要素を非表示にして作成している
+let FLAG = 0; //1:新規メモ要素を非表示にして作成している
 let createdId;
-
 let url = 'http://localhost:8888/keep/processingData.php';
 let newMemoData = { //新規メモ作成時のメモ情報の一時保存
-  'id': '',
-  'title': '',
-  'contents': '',
   'datetime': '',
   'label': '',
   'color_id': '',
@@ -22,8 +17,6 @@ let recoveryMemoData = {
   'setTimeoutId': '',
 }
 let setTimeoutId;
-
-
 /*******************************************/
 //保存検知
 /*******************************************/
@@ -32,32 +25,21 @@ function keyUp(obj) {
 
   let target = obj.parentNode;
   let id = obj.parentNode.id
-  if (id == CREATE) {
+  if (setTimeoutId) {
+    clearTimeout(setTimeoutId);
+  }
+  if (id == CREATE) { //新規メモ作成・更新
     if (FLAG) { //新規メモの要素を非表示で作成しているならDBへの更新と非表示になっている要素への反映
-      console.log('新規メモ更新')
-      if (setTimeoutId) {
-        clearTimeout(setTimeoutId);
-      }
-      setTimeoutId = setTimeout(() => { //
-        updateNewMemo()
-      }, 500);
-    } else {
-      console.log('新規メモ作成')
-      if (setTimeoutId) {
-        clearTimeout(setTimeoutId);
-      }
-      setTimeoutId = setTimeout(() => { //
-        let data = idToData(CREATE);
-        postData(url, CREATE, data);
-      }, 500);
       
+      setTimeoutId = setTimeout(() => {//新規メモ更新
+        updateNewMemo();
+      }, 500);
+    } else { //新規メモ作成
+      setTimeoutId = setTimeout(() => {
+        postData(url, CREATE, idToData(CREATE));
+      }, 500);
     }
-  } else {
-    console.log('普通のメモ更新')
-    //同じメモIDをいじってたら
-    if (setTimeoutId) {
-      clearTimeout(setTimeoutId);
-    }
+  } else {//メモ更新
     setTimeoutId = setTimeout(() => {
       update(toId(id));
     }, 500);
@@ -67,11 +49,16 @@ function keyUp(obj) {
 document.addEventListener('click', (e) => { //新規メモ追加の際、外側をクリックしたら保存
   if (!e.target.closest('#' + CREATE)) {
     if (FLAG) { //すでに新規作成済みなら
+      //新規メモ入力箇所を初期化
       newMemoData.newNode.style.display = "inline-block"
       let target = document.getElementById(CREATE);
       target.children[0].innerText = '';
       target.children[1].innerText = '';
-      target.setAttribute('color_id', 'def')
+      target.setAttribute('color_id', 'def');
+      target.setAttribute('datetime', '');
+      target.setAttribute('label','');
+      target.setAttribute('color_id','');
+      target.setAttribute('user_id','');
       FLAG = 0;
     }
   }
@@ -90,11 +77,11 @@ function updateNewMemo() { //
   data.label = target.getAttribute('label');
   data.color_id = target.getAttribute('color_id');
   data.user_id = target.getAttribute('user_id');
-  
+
   postData(url, 'update', data);
-  
+
   //非表示になっている新規作成メモへ反映
-  newMemoData.newNode.id = 'id_'+createdId;
+  newMemoData.newNode.id = 'id_' + createdId;
   newMemoData.newNode.children[0].innerText = target.children[0].innerText;
   newMemoData.newNode.children[1].innerText = target.children[1].innerText;
   newMemoData.newNode.datetime = getDatetime(new Date());
@@ -106,7 +93,7 @@ function updateNewMemo() { //
 /*******************************************/
 //新規メモ要素作成
 /*******************************************/
-function createEl(id) { //新規メモをメモ一覧に表示
+function createEl(id) { 
   let parentNode = document.querySelector('.memo_area');
   newMemoData.newNode = document.createElement('div');
   let referenceNode = document.querySelector('.memo');
@@ -121,12 +108,9 @@ function createEl(id) { //新規メモをメモ一覧に表示
   newMemoData.newNode.setAttribute('user_id', newMemoData.user_id);
   let template = `
   <div contenteditable="true" class="textArea"  onkeyup="keyUp(this)">${target.children[0].innerText}
-    
   </div>
   <div contenteditable="true" class="textArea"  onkeyup="keyUp(this)">${target.children[1].innerText}
-    
   </div>
-  
     <div class="">
       <button type="button" name="button" onclick=remove(this)>削除_${id}</button>
     </div>
@@ -148,55 +132,43 @@ function createEl(id) { //新規メモをメモ一覧に表示
         </li>
       </ul>
     </div>
-
-
  </div>
      `;
   newMemoData.newNode.innerHTML = template;
   parentNode.insertBefore(newMemoData.newNode, referenceNode);
   FLAG = 1;
 }
-
 /*******************************************/
 //既存メモ更新
 /*******************************************/
 function update(id) {
-  console.log('▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽  update  ▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽')
-  let data = idToData(id)
-  postData(url, 'update', data);
-  console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  update終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
+  postData(url, 'update', idToData(id));
 }
 /*******************************************/
 //メモ削除
 /*******************************************/
 function remove(obj) {
-
   let target = obj.parentNode.parentNode;
   let id = target.id; //メモID
   let memoArea = document.querySelector('.memo_area');
-  //非表示
+  //消去するメモを非表示
   target.style.display = "none";
   recoveryMemoData.targetEl = target;
   recoveryMemoData.setTimeoutId = setTimeout(() => { //3秒後にデータベースから消去
-
     //DBから削除
-    let data = idToData(id);
-    postData(url, 'remove', data);
+    postData(url, 'remove', idToData(id));
     //要素を消す
     target.remove()
-  }, 1000);
-
+  }, 3000);
   // //消去キャンセル用通知要素作成
   let newNode = document.createElement('div')
   newNode.className = 'cancel';
   newNode.innerHTML = '<button type="button" name="button" onclick=removeCancel(this)>戻す</button>';
   document.body.appendChild(newNode)
-
   setTimeout(() => { //消去キャンセル通知を5秒後に消す
     document.querySelector('div.cancel').remove();
     clearTimeout(recoveryMemoData.setTimeoutId);
   }, 5000);
-
 }
 /*******************************************/
 //消去キャンセル
@@ -215,59 +187,29 @@ function removeCancel(obj) {
 /*******************************************/
 function postData(url, key, data) {
   console.log('▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽  postData  ▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽')
-  if (key == 'update') {
-    if (!dataCheck(data)) {
-      return false;
-    }
-  }
   let xhr = new XMLHttpRequest();
   let res;
   xhr.open('POST', url);
   xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
   xhr.send('&' + key + '=' + JSON.stringify(data));
-  if (createdId) {
-    data.id = createdId;
-  }
   console.log('↓最終送信データ')
   console.log(data)
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
       res = JSON.parse(xhr.responseText);
-      //console.log(res)
-
       if (key == CREATE) {
-        createdId = res.data.match(/\d+/) ? res.data : '';
+        createdId = res.data;
         console.log('res=' + createdId)
         createEl(res.data);
-
       }
-
     }
   };
-
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  postData終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
 }
 /*******************************************/
-//データチェック
+//メモidから送信用データを作成する
 /*******************************************/
-function dataCheck(data) {
-
-  /*  if (!data.id.match(/\d+/)) { //data.idが数字ならOK
-      
-      return false;
-    } else*/
-  if (data.title == '' && data.contents == '') { //タイトルと内容が両方からじゃないならOK
-
-    return false;
-  } else {
-    return true;
-  }
-}
-/*******************************************/
-//変更しない データを整えるだけ
-/*******************************************/
-function idToData(id) { //送信用データへ値を代入 //引数idは[id+345]でも番号のみでも可
-
+function idToData(id) {
   console.log('▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽  idToData  ▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽')
   if (id != CREATE && !id.match(/id_/)) {
     id = 'id_' + id
@@ -283,15 +225,11 @@ function idToData(id) { //送信用データへ値を代入 //引数idは[id+345
     data.color_id = target.getAttribute('color_id');
     data.user_id = target.getAttribute('user_id');
     return data;
-
-  } else {
-    console.log('見つからない')
   }
-
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  idToData終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
 }
 /*******************************************/
-//メモIDを数字のみにする
+//メモIDを数字のみにする  例 id_345 → 345
 /*******************************************/
 function toId(id) {
   let res;
@@ -303,14 +241,9 @@ function toId(id) {
   }
   return res;
 }
-
-//////////////////////////////////////////////////////
-
-
-
-
-
-
+/*******************************************/
+//色変更
+/*******************************************/
 function changeColor(obj) {
   console.log('▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽  changeColor  ▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽▽')
   let color_id = obj.id
@@ -322,14 +255,16 @@ function changeColor(obj) {
     target.setAttribute('color_id', color_id)
     updateNewMemo()
   } else {
-    target = document.querySelector('div#'+id);
+    target = document.querySelector('div#' + id);
     console.log(target)
     target.setAttribute('color_id', color_id)
     update(id)
   }
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  changeColor終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
 }
-
+/*******************************************/
+//時刻取得
+/*******************************************/
 function getDatetime(now) {
   let Year = now.getFullYear();
   let Month = now.getMonth() + 1;
@@ -337,6 +272,5 @@ function getDatetime(now) {
   let Hour = now.getHours();
   let Min = now.getMinutes();
   let Sec = now.getSeconds();
-
   return Year + "/" + Month + "/" + Date + " " + Hour + ":" + Min + ":" + Sec;
 }
