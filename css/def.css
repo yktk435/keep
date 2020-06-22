@@ -1,17 +1,19 @@
-body{
+body {
   background-color: rgb(56, 52, 53);
-    color: white;
+  color: white;
 }
 
-.menu{
+.menu {
   background-color: rgb(56, 52, 53);
   border: 1px solid #d5d2d2;
   height: 50px;
   width: 100%;
   position: sticky;
-  top :0px;/* 上端から10pxのところで固定 */
+  top: 0px;
+  /* 上端から10pxのところで固定 */
 }
-.cansell{
+
+.cancel {
   background-color: rgb(56, 52, 53);
   border: 1px solid #d5d2d2;
   height: 30px;
@@ -19,61 +21,148 @@ body{
   position: fixed;
   top: 90%;
   left: 5%;
-  
 }
 
-.share{
-  background-color: transparent;/*背景透明*/
+.share {
+  background-color: transparent;
+  /*背景透明*/
   border-radius: 5px;
   border: 1px solid #d5d2d2;
 }
+
 .memo {
-  display: inline-block;/*テキストに合わせてサイズを変更*/
-  max-width: 200px;/*inline-blockで広がる最大サイズ*/
-  max-height: 400px;/*inline-blockで広がる最大サイズ*/
+  display: inline-block;
+  /*テキストに合わせてサイズを変更*/
+  max-width: 200px;
+  /*inline-blockで広がる最大サイズ*/
+  max-height: 400px;
+  /*inline-blockで広がる最大サイズ*/
   margin: 5px;
   padding: 5px;
+}
+
+/* カラー */
+[color_id="red"]{
+  background-color: rgba(255, 0, 0, 0.5);
+}
+
+[color_id="blue"]{
+  background-color: rgba(0, 0, 255, 0.5);
   
 }
-.add_memo{
+
+[color_id="yellow"]{
+  background-color: rgba(242, 255, 0, 0.5);
+}
+
+[color_id="def"]{
+  background: transparent;
+  ;
+}
+
+.add_memo {
   max-width: 500px;
   padding: 5px;
   margin: 20px auto;
+  height: 100%;
 }
 
 /* --- INPUT=TEXTの標準デザイン設定 ---------------------*/
 .textArea {
-  
   display: block;
- width         : 90%;               /* 入力域の最大幅 */
- max-height: 20px;
- background    : rgb(56, 52, 53);             /* 入力域の背景色 */
- border        : 1px solid rgba(250, 250, 250, 0.1);   /* 入力域の枠線   */
- border-radius : 4px;                 /* 入力域の角丸   */
- padding       : 8px;                /* 入力文字の余白 */
- font-size     : 16px;                /* 入力文字サイズ */
- color         : white;             /* 入力文字の色   */
- font-weight   : bold;                /* 入力文字の太字 */
- letter-spacing: .1em;                /* 入力文字の間隔 */
- line-height   : 19px;                /* 入力文字の間隔 */
- overflow:scroll;
- margin: 5px auto;
+  width: 90%;
+  /* 入力域の最大幅 */
+  
+  background: transparent;
+  /* 入力域の背景色 */
+  border: 1px solid rgba(250, 250, 250, 0.1);
+  /* 入力域の枠線   */
+  border-radius: 4px;
+  /* 入力域の角丸   */
+  padding: 8px;
+  /* 入力文字の余白 */
+  font-size: 16px;
+  /* 入力文字サイズ */
+  color: white;
+  /* 入力文字の色   */
+  font-weight: bold;
+  /* 入力文字の太字 */
+  letter-spacing: .1em;
+  /* 入力文字の間隔 */
+  line-height: 19px;
+  /* 入力文字の間隔 */
+  overflow: scroll;
+  margin: 5px auto;
 }
+
 /* --- 入力フィールドにフォーカスか来たら ----------------*/
 .textArea:focus {
- border-color  : white;                 /* 枠線色     */
- background    : rgba(78, 76, 76, 1);  /* 背景色     */
- outline       : 0;
+  border-color: white;
+  /* 枠線色     */
+  background-color: transparent;
+  /* 背景色     */
+  outline: 0;
 }
+
 /* --- 入力説明の文字(標準) -----------------------------*/
 .textArea:placeholder-shown {
- color         :rgba(255, 255, 255, 0.44) ;                 /* 文字色     */
+  color: rgba(255, 255, 255, 0.44);
+  /* 文字色     */
 }
+
 /* --- 入力説明の文字(Chrome,Safari,Android,iOS等) ---- -*/
 .textArea::-webkit-input-placeholder {
- color         : rgba(255, 255, 255, 0.44);                 /* 文字色     */
+  color: rgba(255, 255, 255, 0.44);
+  /* 文字色     */
 }
+
 /* --- 入力説明の文字(IE用) -----------------------------*/
 .textArea:-ms-input-placeholder {
- color         : rgba(255, 255, 255, 0.44);                 /* 文字色     */
+  color: rgba(255, 255, 255, 0.44);
+  /* 文字色     */
+}
+
+.gnav {
+  display: flex;
+  /* [flex]ある要素に定義するだけで、その直下の要素が並列になる便利なスタイルです。 この場合はgnav直下を並列にしている。*/
+  height: 2rem;
+  /*高さを指定している。これを指定しないと下のliにマウスオーバーした時に意図しないところでマウスオーバーが外れてしまう*/
+  margin: 0 auto;
+  /*中央寄せ*/
+}
+
+.gnav>li {
+  /*親階層のみ幅を25%にする*/
+  width: 25%;
+}
+
+/*全てのリスト・リンク共通*/
+.gnav li {
+  list-style: none;
+  /*箇条書きの先頭の「・」を消す*/
+  position: relative;
+  background: rgba(192, 0, 255, 0.41);
+  border: 1px solid #eee;
+  color: #fff;
+  display: block;
+  height: 2rem;
+  width: 150px;
+  line-height: 2rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+/*子階層以降共通*/
+.gnav li li {
+  height: 0;
+  display: none;
+}
+
+.gnav li li {
+  border-top: 1px solid #eee;
+}
+
+.gnav li:hover>ul>li {
+  height: 2rem;
+  display: block;
 }
