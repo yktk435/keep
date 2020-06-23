@@ -37,13 +37,13 @@ try {
 
 function update($db, $data)
 {
-    $stt = $db->prepare('UPDATE memo SET title=:title, contents=:contents, datetime=:datetime, label=:label, color_id=:color_id, user_id=:user_id WHERE id=:id');
+    $stt = $db->prepare('UPDATE memo SET title=:title, contents=:contents, datetime=:datetime, label_id=:label_id, color_id=:color_id, user_id=:user_id WHERE id=:id');
 
     $stt->bindValue(':id', $data['id']);
     $stt->bindValue(':title', $data['title']);
     $stt->bindValue(':datetime', $data['datetime']);
     $stt->bindValue(':contents', $data['contents']);
-    $stt->bindValue(':label', $data['label']);
+    $stt->bindValue(':label_id', $data['label_id']);
     $stt->bindValue(':color_id', $data['color_id']);
     $stt->bindValue(':user_id', (int)$data['user_id']);
     $stt->execute();
@@ -59,12 +59,12 @@ function remove($db, $data)
 
 function create($db, $data)
 {
-    $stt = $db->prepare('INSERT INTO memo (title, contents, datetime, label, color_id, user_id) VALUES(:title, :contents, :datetime, :label, :color_id, :user_id)');
+    $stt = $db->prepare('INSERT INTO memo (title, contents, datetime, label_id, color_id, user_id) VALUES(:title, :contents, :datetime, :label_id, :color_id, :user_id)');
   
     $stt->bindValue(':title', $data['title']);
     $stt->bindValue(':datetime', $data['datetime']);
     $stt->bindValue(':contents', $data['contents']);
-    $stt->bindValue(':label', $data['datetime']);
+    $stt->bindValue(':label_id', $data['datetime']);
     $stt->bindValue(':color_id', $data['color_id']);
     $stt->bindValue(':user_id', (int)$data['user_id']);
     $stt->execute();

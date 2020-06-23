@@ -33,16 +33,11 @@ try {
   </div>
   <!-- メモ追加 -->
 
-  <div id="create" class="add_memo share" datetime="" label="" user_id="" color_id="def">
-    
- <!--
-    <textarea class="textArea" placeholder="タイトル" cols="" rows="" wrap="soft" onblur="focusOut(this)" onfocus="focusOn(this)"></textarea>
+  <div id="create" class="add_memo share" datetime="" label_id="" user_id="" color_id="def">
 
-    <textarea class="textArea" placeholder="内容" cols="" rows="" wrap="soft" onblur="focusOut(this)" onfocus="focusOn(this)"></textarea>-->
-    <div contenteditable="true" class="textArea"  onkeyup="keyUp(this)">
-      
-    </div>
-    <div contenteditable="true" class="textArea"  onkeyup="keyUp(this)">
+    <div contenteditable="true" class="textArea" onkeyup="keyUp(this)"></div>
+    <div contenteditable="true" class="textArea" onkeyup="keyUp(this)"></div>
+    <div id="create" class="label-area">
       
     </div>
 
@@ -58,9 +53,9 @@ try {
           </ul>
         </li>
         <li>ラベル<span>▼</span>
-          <ul>
-            <li>ラベル1</li>
-            <li>ラベル1</li>
+          <ul id="create">
+            <li onclick="setLabel(this)" label-status="false" label_id="1">ラベル1</li>
+            <li onclick="setLabel(this)" label-status="false" label_id="2">ラベル2</li>
           </ul>
         </li>
       </ul>
@@ -74,9 +69,8 @@ try {
     if ($res) {
         foreach ($res as $value) {
             $msg=<<<EOD
-         <div class="memo share" id="id_{$value['id']}"  datetime="{$value['datetime']}"         label="{$value['label']}" user_id="{$value['user_id']}" color_id="{$value['color_id']}">
+         <div class="memo share" id="id_{$value['id']}"  datetime="{$value['datetime']}"         label_id="{$value['label_id']}" user_id="{$value['user_id']}" color_id="{$value['color_id']}">
          <div contenteditable="true" class="textArea"  onkeyup="keyUp(this)">{$value['title']}
-           
          </div>
          <div contenteditable="true" class="textArea"  onkeyup="keyUp(this)">{$value['contents']}
            
@@ -97,8 +91,9 @@ try {
                </li>
                <li>ラベル<span>▼</span>
                  <ul>
-                   <li>ラベル1</li>
-                   <li>ラベル1</li>
+                   <ul id="{$value['id']}">
+                     <li onclick="setLabel(this)" label-status="false" label_id="1">ラベル1</li>
+                     <li onclick="setLabel(this)" label-status="false" label_id="2">ラベル2</li>
                  </ul>
                </li>
              </ul>
