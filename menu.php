@@ -27,17 +27,7 @@ try {
 
 <body>
 
-<div class="dddd" style="display:inline-block;position:fixed;top:j200px">
-  <div class="" style="border: 1px solid rgba(255, 255, 255);">
-    ラベル1
-  </div>
-  <div class="" style="border: 1px solid rgba(255, 255, 255);">
-    ラベル2
-  </div>
-  <div class="" style="border: 1px solid rgba(255, 255, 255);">
-    ラベル3
-  </div>
-</div>
+
   <div class="menu">
     メニュー
   </div>
@@ -100,21 +90,15 @@ try {
                    <li id="yellow" onclick=changeColor(this)>黄</li>
                  </ul>
                </li>
-<<<<<<< HEAD
+
                <li class="label-menu">ラベル<span>▼</span>
                    <ul id="id_{$value['id']}" class="label-parent">
                      <li><input id="id_{$value['id']}" type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" onkeypress="addLabel(event.keyCode,this);"></li>
                      <li onclick="setLabel(this)" label-status="false" label_id="1">ラベル1</li>
                      <li onclick="setLabel(this)" label-status="false" label_id="2">ラベル2</li>
                    </ul>
-=======
-               <li>ラベル<span>▼</span>
-                 <ul>
-                   <ul id="{$value['id']}">
-                     <li onclick="setLabel(this)" label-status="false" label_id="1">ラベル1</li>
-                     <li onclick="setLabel(this)" label-status="false" label_id="2">ラベル2</li>
-                 </ul>
->>>>>>> 33d7b0bd81f42e1bef5b07a149799b06e961fd14
+
+
                </li>
              </ul>
            </div>
