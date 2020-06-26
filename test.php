@@ -6,7 +6,7 @@ try {
   $stt = $db->prepare('INSERT INTO memo(title, contents, datetime,label, color_id, user_id) VALUES(:title, :contents, :datetime, :label, :color_id, :user_id)');
   
   $stt->bindValue(':title', 'タイトル');
-  $stt->bindValue(':datetime', '2020/06/14 10:22:58');
+  $stt->bindValue(':datetime', date('Y/m/d H:i:s'));
   $stt->bindValue(':contents', '内容');
   $stt->bindValue(':label', 'ラベル');
   $stt->bindValue(':color_id', 000001);
