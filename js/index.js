@@ -189,8 +189,8 @@ function postData(url, key, data) {
           createEl(res.data);
           break;
         case 'createLabel':
-console.log(res.labelId)
-createLabelEl(res.labelId, data.label_name)
+          console.log(res.labelId)
+          createLabelEl(res.labelId, data.label_name)
           break;
         default:
 
@@ -274,11 +274,7 @@ function setLabel(obj) {
     removeLabel(memoId, labelId);
     obj.setAttribute('label-status', 'false')
     //label_idへ反映
-<<<<<<< HEAD
     parentNode.setAttribute('label_id', replaveLabelId(getAttribute, labelId))
-=======
-    parentNode.setAttribute('label_id', replaveLabelId(getAttribute,labelId))
->>>>>>> 33d7b0bd81f42e1bef5b07a149799b06e961fd14
   } else {
     createLabel(memoId, labelId, labelName);
     console.log('表示')
@@ -290,15 +286,15 @@ function setLabel(obj) {
 
 }
 
-function replaveLabelId(label_id,labelId) {
+function replaveLabelId(label_id, labelId) {
   let arr = label_id.split(' ');
-  arr = arr.filter(function(a) {//labelIdを消す
+  arr = arr.filter(function(a) { //labelIdを消す
     return a !== labelId;
   });
-  arr = arr.filter(v => v);//配列内の空白を消す
-  
+  arr = arr.filter(v => v); //配列内の空白を消す
+
   console.log(arr.join(' '));
-  return arr.join(' ');//配列を文字列にする
+  return arr.join(' '); //配列を文字列にする
 
 }
 /*******************************************/
@@ -359,7 +355,7 @@ function createLabelEl(labelId, labelName) {
   let parentNode = document.querySelectorAll('.label-parent');
   let newNode = document.createElement('li');
   let referenceNode = document.querySelector('.memo');
-  
+
   //newNode.className = ;
   newNode.onkeypress = "setLabel(this)";
   newNode.setAttribute('label_id', labelId)
@@ -369,13 +365,13 @@ function createLabelEl(labelId, labelName) {
   // parentNode.forEach((e)=>{
   //   e.appendChild(newNode);
   // });
-  let g=Array.from(parentNode);
+  let g = Array.from(parentNode);
   let gs;
   console.log(g);
-for (let i = 0; i < g.length; i++) {
-  console.log(g[i])
-  gs=g[i].appendChild(newNode);
-}
+  for (let i = 0; i < g.length; i++) {
+    console.log(g[i])
+    gs = g[i].appendChild(newNode);
+  }
   //parentNode.appendChild(newNode);
 }
 
