@@ -6,7 +6,7 @@ let createdId;
 let url = 'http://localhost:8888/keep/processingData.php';
 let newMemoData = { //新規メモ作成時のメモ情報の一時保存
   'datetime': '',
-  'label': '',
+  'label_id': '',
   'color_id': '',
   'user_id': '',
   'className': 'memo share',
@@ -30,19 +30,20 @@ function keyUp(obj) {
     if (id == CREATE) { //新規メモ作成・更新
       if (FLAG) { //新規メモの要素を非表示で作成しているならDBへの更新と非表示になっている要素への反映
         //新規メモ更新
-          updateNewMemo();
+        updateNewMemo();
       } else { //新規メモ作成
-          postData(url, CREATE, idToData(CREATE));
+        postData(url, CREATE, idToData(CREATE));
       }
-    } else {//メモ更新
+    } else { //メモ更新
       postData(url, 'update', idToData(toId(id)));
     }
-  },500);
+  }, 500);
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  keyUp終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
 }
 document.addEventListener('click', (e) => { //新規メモ追加の際、外側をクリックしたら保存
   if (!e.target.closest('#' + CREATE)) {
     if (FLAG) { //すでに新規作成済みなら
+      updateNewMemo();
       //新規メモ入力箇所を初期化
       newMemoData.newNode.style.display = "inline-block"
       let target = document.getElementById(CREATE);
@@ -50,9 +51,9 @@ document.addEventListener('click', (e) => { //新規メモ追加の際、外側�
       target.children[1].innerText = '';
       target.setAttribute('color_id', 'def');
       target.setAttribute('datetime', '');
-      target.setAttribute('label','');
-      target.setAttribute('color_id','');
-      target.setAttribute('user_id','');
+      target.setAttribute('label_id', '');
+      target.setAttribute('color_id', '');
+      target.setAttribute('user_id', '');
       FLAG = 0;
     }
   }
@@ -64,7 +65,7 @@ function updateNewMemo() { //
   let data = {}
   let target = document.getElementById(CREATE)
   //DB送信用データの作成
-  data=idToData(CREATE);
+  data = idToData(CREATE);
   data.id = createdId;
 
   postData(url, 'update', data);
@@ -74,14 +75,14 @@ function updateNewMemo() { //
   newMemoData.newNode.children[0].innerText = target.children[0].innerText;
   newMemoData.newNode.children[1].innerText = target.children[1].innerText;
   newMemoData.newNode.datetime = getDatetime(new Date());
-  newMemoData.newNode.setAttribute('label', target.getAttribute('label'));
+  newMemoData.newNode.setAttribute('label_id', target.getAttribute('label_id'));
   newMemoData.newNode.setAttribute('color_id', target.getAttribute('color_id'));
   newMemoData.newNode.setAttribute('user_id', target.getAttribute('user_id'));
 }
 /*******************************************/
 //新規メモ要素作成
 /*******************************************/
-function createEl(id) { 
+function createEl(id) {
   let parentNode = document.querySelector('.memo_area');
   newMemoData.newNode = document.createElement('div');
   let referenceNode = document.querySelector('.memo');
@@ -90,10 +91,10 @@ function createEl(id) {
   newMemoData.newNode.id = "id_" + id;
   newMemoData.newNode.className = newMemoData.className;
   newMemoData.newNode.style.display = "none";
-  newMemoData.newNode.setAttribute('datetime', newMemoData.datetime);
-  newMemoData.newNode.setAttribute('label', newMemoData.label);
-  newMemoData.newNode.setAttribute('color_id', newMemoData.color_id);
-  newMemoData.newNode.setAttribute('user_id', newMemoData.user_id);
+  newMemoData.newNode.setAttribute('datetime', target.getAttribute('datetime'));
+  newMemoData.newNode.setAttribute('label_id', target.getAttribute('label_id'));
+  newMemoData.newNode.setAttribute('color_id', target.getAttribute('color_id'));
+  newMemoData.newNode.setAttribute('user_id', target.getAttribute('user_id'));
   let template = `
   <div contenteditable="true" class="textArea"  onkeyup="keyUp(this)">${target.children[0].innerText}
   </div>
@@ -179,9 +180,20 @@ function postData(url, key, data) {
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
       res = JSON.parse(xhr.responseText);
-      if (key == CREATE) {
-        createdId = res.data;
-        createEl(res.data);
+      console.log('===========response===========')
+      console.log(res)
+      console.log('===========response===========')
+      switch (key) {
+        case CREATE:
+          createdId = res.data;
+          createEl(res.data);
+          break;
+        case 'createLabel':
+console.log(res.labelId)
+createLabelEl(res.labelId, data.label_name)
+          break;
+        default:
+
       }
     }
   };
@@ -202,7 +214,7 @@ function idToData(id) {
     data.title = target.children[0].innerText;
     data.contents = target.children[1].innerText;
     data.datetime = getDatetime(new Date());
-    data.label = target.getAttribute('label');
+    data.label_id = target.getAttribute('label_id');
     data.color_id = target.getAttribute('color_id');
     data.user_id = target.getAttribute('user_id');
     return data;
@@ -231,16 +243,78 @@ function changeColor(obj) {
   let id = obj.parentNode.id;
   let target;
   if (id == CREATE) {
+    console.log(CREATE)
     target = document.getElementById(CREATE);
     target.setAttribute('color_id', color_id)
-    updateNewMemo()
+    //updateNewMemo()
   } else {
+    console.log(id)
     target = document.querySelector('div#' + id);
     console.log(target)
     target.setAttribute('color_id', color_id)
     postData(url, 'update', idToData(toId(id)));
   }
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  changeColor終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
+}
+/*******************************************/
+//ラベル
+/*******************************************/
+function setLabel(obj) {
+
+  let memoId = obj.parentNode.id;
+  let labelId = obj.getAttribute('label_id');
+  let labelName = obj.innerText;
+  let labelStatus = obj.getAttribute('label-status');
+  let parentNode = document.getElementById(memoId);
+  let getAttribute = parentNode.getAttribute('label_id')
+
+
+  if (labelStatus == 'true') {
+    console.log('消す')
+    removeLabel(memoId, labelId);
+    obj.setAttribute('label-status', 'false')
+    //label_idへ反映
+    parentNode.setAttribute('label_id', replaveLabelId(getAttribute, labelId))
+  } else {
+    createLabel(memoId, labelId, labelName);
+    console.log('表示')
+    obj.setAttribute('label-status', 'true')
+    //label_idへ反映
+    parentNode.setAttribute('label_id', getAttribute + ' ' + labelId)
+  }
+  postData(url, 'update', idToData(toId(memoId)));
+
+}
+
+function replaveLabelId(label_id, labelId) {
+  let arr = label_id.split(' ');
+  arr = arr.filter(function(a) { //labelIdを消す
+    return a !== labelId;
+  });
+  arr = arr.filter(v => v); //配列内の空白を消す
+
+  console.log(arr.join(' '));
+  return arr.join(' '); //配列を文字列にする
+
+}
+/*******************************************/
+//ラベル作成 削除
+/*******************************************/
+function createLabel(memoId, labelId, labelName) {
+  console.log('ラベル作成')
+  let e = document.createElement('div');
+  let target = document.querySelector('#' + memoId + '.label-area');
+  e.setAttribute('label_id', labelId);
+  e.className = 'label'
+  e.innerText = labelName;
+  target.appendChild(e);
+
+}
+
+function removeLabel(memoId, labelId) {
+  console.log('ラベル消す')
+  let target = document.querySelector('div#' + memoId + ' [label_id="' + labelId + '"]');
+  target.remove();
 }
 /*******************************************/
 //時刻取得
@@ -253,4 +327,54 @@ function getDatetime(now) {
   let Min = now.getMinutes();
   let Sec = now.getSeconds();
   return Year + "/" + Month + "/" + Date + " " + Hour + ":" + Min + ":" + Sec;
+}
+//ラベル名を入力してエンターを押したらラベルテーブルとラベル中カンテ-ブルへ登録する
+function addLabel(code, obj) {
+  let memoId = toId(obj.id);
+  let labelName = obj.value;
+  let data = {
+    'label_name': labelName,
+    'memo_id': memoId,
+  }
+  //エンターキー押下なら
+  if (13 === code) {
+    if (labelName == '') {
+      return false;
+    } else {
+      console.log(data)
+      //ラベルエーブルへの登録とラベル中間テーブルへの登録
+      postData(url, 'createLabel', data);
+    }
+
+    //ページ上のラベルのところに表示させる要素を作成する。
+    obj.value = '';
+  }
+}
+
+function createLabelEl(labelId, labelName) {
+  let parentNode = document.querySelectorAll('.label-parent');
+  let newNode = document.createElement('li');
+  let referenceNode = document.querySelector('.memo');
+  
+  //newNode.className = ;
+  newNode.onkeypress = "setLabel(this)";
+  newNode.setAttribute('label_id', labelId)
+  newNode.setAttribute('label-status', 'true')
+
+  newNode.innerHTML = labelName;
+  // parentNode.forEach((e)=>{
+  //   e.appendChild(newNode);
+  // });
+  let g=Array.from(parentNode);
+  let gs;
+  console.log(g);
+for (let i = 0; i < g.length; i++) {
+  console.log(g[i])
+  gs=g[i].appendChild(newNode);
+}
+  //parentNode.appendChild(newNode);
+}
+
+function linkMemoTolabel(url, memoId, labelId) {
+
 }
