@@ -274,7 +274,11 @@ function setLabel(obj) {
     removeLabel(memoId, labelId);
     obj.setAttribute('label-status', 'false')
     //label_idへ反映
+<<<<<<< HEAD
     parentNode.setAttribute('label_id', replaveLabelId(getAttribute, labelId))
+=======
+    parentNode.setAttribute('label_id', replaveLabelId(getAttribute,labelId))
+>>>>>>> 33d7b0bd81f42e1bef5b07a149799b06e961fd14
   } else {
     createLabel(memoId, labelId, labelName);
     console.log('表示')
@@ -286,15 +290,15 @@ function setLabel(obj) {
 
 }
 
-function replaveLabelId(label_id, labelId) {
+function replaveLabelId(label_id,labelId) {
   let arr = label_id.split(' ');
-  arr = arr.filter(function(a) { //labelIdを消す
+  arr = arr.filter(function(a) {//labelIdを消す
     return a !== labelId;
   });
-  arr = arr.filter(v => v); //配列内の空白を消す
-
+  arr = arr.filter(v => v);//配列内の空白を消す
+  
   console.log(arr.join(' '));
-  return arr.join(' '); //配列を文字列にする
+  return arr.join(' ');//配列を文字列にする
 
 }
 /*******************************************/
