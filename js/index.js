@@ -269,23 +269,50 @@ function setLabel(obj) {
   let labelStatus = obj.getAttribute('label-status');
   let parentNode = document.getElementById(memoId);
   let getAttribute = parentNode.getAttribute('label_id')
-
-
-  if (labelStatus == 'true') {
-    console.log('消す')
-    console.log('ラベルID=' + labelId)
-    removeLabel(memoId, labelId);
-    obj.setAttribute('label-status', 'false')
-    //label_idへ反映
-    parentNode.setAttribute('label_id', replaveLabelId(getAttribute, labelId))
-  } else {
-    createLabel(memoId, labelId, labelName);
-    console.log('表示')
-    obj.setAttribute('label-status', 'true')
-    //label_idへ反映
-    parentNode.setAttribute('label_id', getAttribute + ' ' + labelId)
+  let data = {
+    'label_id': labelId,
+    'memo_id': toId(memoId),
   }
-  postData(url, 'update', idToData(toId(memoId)));
+   let lavelList = Array.from(document.querySelector('#' + memoId + '.label-area').children);
+  // 
+
+  try {
+    lavelList.forEach((i) => {
+      if(labelId==i.getAttribute('label_id')){
+        console.log('消す')
+        i.remove();
+        postData(url, 'removeLabelLink', data); 
+        throw new Error('表示へ');
+      }
+    })
+    console.log('表示')
+    createLabel(memoId, labelId, labelName);   
+    postData(url, 'addLabel', data); 
+  } catch (e) {
+    
+    
+  }
+     
+
+  // if (labelStatus == 'true') {
+  //   console.log('消す')
+  //   console.log('ラベルID=' + labelId)
+  //   removeLabel(memoId, labelId);
+  //   obj.setAttribute('label-status', 'false')
+  //   //label_idへ反映
+  //   //parentNode.setAttribute('label_id', replaveLabelId(getAttribute, labelId))
+  //   postData(url, 'update', idToData(toId(memoId)));
+  // } else {
+  //       console.log('表示')
+  // 
+  // 
+  // 
+  //   obj.setAttribute('label-status', 'true')
+  //   //label_idへ反映
+  //   postData(url, 'addLabel', data);
+  // 
+  // }
+
 
 }
 

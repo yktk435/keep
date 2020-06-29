@@ -16,6 +16,7 @@ try {
     while ($row=$stt->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_UNIQUE)) {
         $labelData=$row;
     }
+    
 } catch (PDOException $e) {
     print "エラーメッセージ：{$e->getMessage()}";
 }
@@ -43,13 +44,15 @@ try {
   <?php
   if ($labelData) {
       foreach ($labelData as $labelId =>$labelName) {
+        
           $text.=<<<EOF
       <div class="" style="border: 1px solid #d5d2d2;" onclick="setLabel(this)" label_id="{$labelId}">
         {$labelName}
       </div>
       EOF;
-          print  $text;
+          
       }
+      print  $text;
   }
 ?>
 
