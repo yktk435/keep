@@ -7,6 +7,15 @@ try {
     while ($row=$stt->fetch(PDO::FETCH_ASSOC)) {
         $res[]=$row;
     }
+    
+    $stt = $db->prepare('SELECT memo_id,label_id FROM label_middle');
+    $stt->execute();
+    $memoIdlabelIdRes=$row=$stt->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_GROUP);
+    $stt = $db->prepare('SELECT * FROM label');
+    $stt->execute();
+    while ($row=$stt->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_UNIQUE)) {
+        $labelData=$row;
+    }
 } catch (PDOException $e) {
     print "エラーメッセージ：{$e->getMessage()}";
 }
@@ -26,8 +35,25 @@ try {
 </head>
 
 <body>
+<div id="" class="aaaa" style="padding: 5px;display:inline-block;position: fixed;background-color:rgb(73, 73, 73);top:-999px;left:-999px;">
+  <div  class="">
+    <input type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" onkeypress="addLabel(event.keyCode,this);">
+  </div>
+  
+  <?php
+  if ($labelData) {
+      foreach ($labelData as $labelId =>$labelName) {
+          $text.=<<<EOF
+      <div class="" style="border: 1px solid #d5d2d2;" onclick="setLabel(this)" label_id="{$labelId}">
+        {$labelName}
+      </div>
+      EOF;
+          print  $text;
+      }
+  }
+?>
 
-
+</div>
   <div class="menu">
     メニュー
   </div>
@@ -44,7 +70,7 @@ try {
 
     <div class="other_menu">
       <ul class="gnav">
-        <li>カラー <span>▼</span>
+        <li>カラー 
           <ul id="create">
             <li id="def" onclick=changeColor(this)>def</li>
             <li id="red" onclick=changeColor(this)>赤</li>
@@ -52,12 +78,13 @@ try {
             <li id="yellow" onclick=changeColor(this)>黄</li>
           </ul>
         </li>
-        <li class="label-menu">ラベル<span>▼</span>
-          <ul id="create">
+        <li id="create" class="label-menu">ラベル
+<!--          <ul id="create">
             <li><input id="create" type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" onkeypress="addLabel(event.keyCode);"></li>
             <li onclick="setLabel(this)" label-status="false" label_id="1">ラベル1</li>
             <li onclick="setLabel(this)" label-status="false" label_id="2">ラベル2</li>
-          </ul>
+            
+          </ul>-->
         </li>
       </ul>
     </div>
@@ -77,12 +104,28 @@ try {
            
          </div>
          
+         <div id="id_{$value['id']}" class="label-area">
+         EOD;
+         
+            if ($memoIdlabelIdRes) {
+                foreach ((array)$memoIdlabelIdRes[$value['id']] as $labelId) {
+                    $msg.=<<<EOD
+               <div label_id="{$labelId}" class="label">{$labelData[$labelId]}</div>
+               EOD;
+                }
+            }
+         
+         
+            $msg.=<<<EOD
+         </div>
+         EOD;
+            $msg.=<<<EOD
            <div class="">
              <button type="button" name="button" onclick=remove(this)>削除_{$value['id']}</button>
            </div>
            <div class="other_menu">
              <ul class="gnav">
-               <li>カラー <span>▼</span>
+               <li>カラー 
                  <ul id="id_{$value['id']}">
                    <li id="def" onclick=changeColor(this)>def</li>
                    <li id="red" onclick=changeColor(this)>赤</li>
@@ -91,12 +134,7 @@ try {
                  </ul>
                </li>
 
-               <li class="label-menu">ラベル<span>▼</span>
-                   <ul id="id_{$value['id']}" class="label-parent">
-                     <li><input id="id_{$value['id']}" type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" onkeypress="addLabel(event.keyCode,this);"></li>
-                     <li onclick="setLabel(this)" label-status="false" label_id="1">ラベル1</li>
-                     <li onclick="setLabel(this)" label-status="false" label_id="2">ラベル2</li>
-                   </ul>
+               <li id="id_{$value['id']}" class="label-menu">ラベル
 
 
                </li>

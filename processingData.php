@@ -19,9 +19,10 @@ try {
         create($db, $data);
         $response['data']=$db->lastInsertId();
     } elseif ($_POST['createLabel']) {
-      $data=json_decode($_POST['createLabel'], true);//第2引数をtrueにしないと$dataが連想配列にならない
-        
-        $response['labelId']=createLabel($db, $data);
+        $data=json_decode($_POST['createLabel'], true);//第2引数をtrueにしないと$dataが連想配列にならない
+        if ($data['label_name']) {
+            $response['labelId']=createLabel($db, $data);;
+        }
     } elseif ($_POST['removeLabel']) {
     }
 } catch (PDOException $e) {
@@ -76,7 +77,6 @@ function create($db, $data)
 function createLabel($db, $data)
 {
     $stt = $db->prepare('INSERT INTO label (name) VALUES(:name)');
-
     $stt->bindValue(':name', $data['label_name']);
     $stt->execute();
     $lastId=$db->lastInsertId();

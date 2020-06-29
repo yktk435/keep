@@ -105,7 +105,7 @@ function createEl(id) {
     </div>
     <div class="other_menu">
       <ul class="gnav">
-        <li>カラー <span>▼</span>
+        <li>カラー 
           <ul id="id_${id}">
             <li id="def" onclick=changeColor(this)>def</li>
             <li id="red" onclick=changeColor(this)>赤</li>
@@ -113,7 +113,7 @@ function createEl(id) {
             <li id="yellow" onclick=changeColor(this)>黄</li>
           </ul>
         </li>
-        <li>ラベル<span>▼</span>
+        <li>ラベル
           <ul>
             <li>ラベル1</li>
             <li>ラベル1</li>
@@ -179,6 +179,7 @@ function postData(url, key, data) {
   console.log(data)
   xhr.onreadystatechange = function() {
     if (xhr.readyState === 4 && xhr.status === 200) {
+      console.log(xhr.responseText)
       res = JSON.parse(xhr.responseText);
       console.log('===========response===========')
       console.log(res)
@@ -189,8 +190,9 @@ function postData(url, key, data) {
           createEl(res.data);
           break;
         case 'createLabel':
-          console.log(res.labelId)
-          createLabelEl(res.labelId, data.label_name)
+
+          createLabelEltoMenu(res.labelId, data.label_name);
+          createLabel('id_' + data.memo_id, res.labelId, data.label_name);
           break;
         default:
 
@@ -260,8 +262,8 @@ function changeColor(obj) {
 //ラベル
 /*******************************************/
 function setLabel(obj) {
-
   let memoId = obj.parentNode.id;
+  //console.log(memoId)
   let labelId = obj.getAttribute('label_id');
   let labelName = obj.innerText;
   let labelStatus = obj.getAttribute('label-status');
@@ -271,6 +273,7 @@ function setLabel(obj) {
 
   if (labelStatus == 'true') {
     console.log('消す')
+    console.log('ラベルID=' + labelId)
     removeLabel(memoId, labelId);
     obj.setAttribute('label-status', 'false')
     //label_idへ反映
@@ -313,7 +316,7 @@ function createLabel(memoId, labelId, labelName) {
 
 function removeLabel(memoId, labelId) {
   console.log('ラベル消す')
-  let target = document.querySelector('div#' + memoId + ' [label_id="' + labelId + '"]');
+  let target = document.querySelector('div#' + memoId + '.label-area [label_id="' + labelId + '"]');
   target.remove();
 }
 /*******************************************/
@@ -330,51 +333,91 @@ function getDatetime(now) {
 }
 //ラベル名を入力してエンターを押したらラベルテーブルとラベル中カンテ-ブルへ登録する
 function addLabel(code, obj) {
-  let memoId = toId(obj.id);
+
+  let target = obj.parentNode.parentNode;
+  let memoId = toId(target.id);
   let labelName = obj.value;
   let data = {
     'label_name': labelName,
     'memo_id': memoId,
   }
-  //エンターキー押下なら
-  if (13 === code) {
-    if (labelName == '') {
-      return false;
-    } else {
-      console.log(data)
-      //ラベルエーブルへの登録とラベル中間テーブルへの登録
-      postData(url, 'createLabel', data);
-    }
+  let t = Array.from(document.querySelector("div.aaaa").children)
 
+  //エンターキー押下なら
+  if (13 === code && labelName != '') {
+    try {
+      t.forEach(item => {
+        if (labelName == item.innerText) {
+          item.click();
+          throw new Error('終了します');
+        }
+      });
+      //ラベルテーブルへの登録とラベル中間テーブルへの登録
+      postData(url, 'createLabel', data);
+    } catch (e) {
+      console.log(e);
+    }
     //ページ上のラベルのところに表示させる要素を作成する。
     obj.value = '';
   }
 }
 
-function createLabelEl(labelId, labelName) {
-  let parentNode = document.querySelectorAll('.label-parent');
-  let newNode = document.createElement('li');
-  let referenceNode = document.querySelector('.memo');
+
+
+function createLabelEltoMenu(labelId, labelName) {
+  let parentNode = document.querySelectorAll('.aaaa');
+  let newNode = document.createElement('div');
+  //let referenceNode = document.querySelector('.memo');
 
   //newNode.className = ;
-  newNode.onkeypress = "setLabel(this)";
+  newNode.onclick = "setLabel(this)";
   newNode.setAttribute('label_id', labelId)
   newNode.setAttribute('label-status', 'true')
+  newNode.setAttribute('onclick', 'setLabel(this)')
+  newNode.style = "border: 1px solid #d5d2d2;";
 
   newNode.innerHTML = labelName;
-  // parentNode.forEach((e)=>{
-  //   e.appendChild(newNode);
-  // });
-  let g = Array.from(parentNode);
-  let gs;
-  console.log(g);
-  for (let i = 0; i < g.length; i++) {
-    console.log(g[i])
-    gs = g[i].appendChild(newNode);
-  }
+  parentNode.forEach((e) => {
+    e.appendChild(newNode);
+  });
+  // let g = Array.from(parentNode);
+  // let gs;
+  // console.log(g);
+  // for (let i = 0; i < g.length; i++) {
+  //   console.log(g[i])
+  //   gs = g[i].appendChild(newNode);
+  // }
   //parentNode.appendChild(newNode);
 }
 
-function linkMemoTolabel(url, memoId, labelId) {
+window.onmouseout = function(e) {
 
+  let subMenu = document.querySelector('.aaaa');
+  let subTop = subMenu.getBoundingClientRect().top;
+  let subLeft = subMenu.getBoundingClientRect().left;
+  let subHeight = subMenu.getBoundingClientRect().height;
+  let memoId;
+  //console.log(e.toElement)
+  if (e && e.toElement.className.match(/label-menu/)) { //クラス名がlabel-menuだったら
+    memoId = e.toElement.id;
+    if (memoId != '') {
+      subMenu.id = memoId;
+    }
+
+
+    let li = e.toElement.getBoundingClientRect()
+    // console.log('li=top=' + li.top);
+    // console.log('li=left=' + li.left);
+    // console.log('li=height=' + li.height);
+
+    subMenu.style.top = String(li.top + li.height - 5) + "px";
+    subMenu.style.left = li.left + "px";
+  } else if (e && (e.target.className.match(/aaaa/) || e.target.parentNode.className.match(/aaaa/) || e.toElement.className.match(/aaaa/) || e.toElement.parentNode.className.match(/aaaa/))) {
+    //継続
+  } else {
+    subMenu.style.top = "-9999px";
+    subMenu.style.left = "0px";
+    subMenu.id = '';
+
+  }
 }
