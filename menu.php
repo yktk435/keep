@@ -82,12 +82,6 @@ try {
           </ul>
         </li>
         <li id="create" class="label-menu">ラベル
-<!--          <ul id="create">
-            <li><input id="create" type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" onkeypress="addLabel(event.keyCode);"></li>
-            <li onclick="setLabel(this)" label-status="false" label_id="1">ラベル1</li>
-            <li onclick="setLabel(this)" label-status="false" label_id="2">ラベル2</li>
-            
-          </ul>-->
         </li>
       </ul>
     </div>
@@ -124,7 +118,7 @@ try {
          EOD;
             $msg.=<<<EOD
            <div class="">
-             <button type="button" name="button" onclick=remove(this)>削除_{$value['id']}</button>
+             <button type="button" name="button" onclick=removeObj(this)>削除_{$value['id']}</button>
            </div>
            <div class="other_menu">
              <ul class="gnav">

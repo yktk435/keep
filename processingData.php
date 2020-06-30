@@ -62,7 +62,9 @@ function update($db, $data)
 function remove($db, $data)
 {
     $stt = $db->prepare('DELETE FROM memo WHERE id=:id');
-    
+    $stt->bindValue(':id', $data['id']);
+        $stt->execute();
+    $stt = $db->prepare('DELETE FROM label_middle WHERE memo_id=:id');
     $stt->bindValue(':id', $data['id']);
     $stt->execute();
 }
