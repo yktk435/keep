@@ -19,7 +19,9 @@ class Memo {
 }
 
 for(let i = 0; i<10; i++){
-    
+    let memo = new Memo();
+    memo.id = i;
+    document.getElementById("contents").appendChild(memo.createLiTag());
 }
 
 
