@@ -19,10 +19,17 @@ try {
         create($db, $data);
         $response['data']=$db->lastInsertId();
     } elseif ($_POST['createLabel']) {
-      $data=json_decode($_POST['createLabel'], true);//第2引数をtrueにしないと$dataが連想配列にならない
-        
-        $response['labelId']=createLabel($db, $data);
+        $data=json_decode($_POST['createLabel'], true);//第2引数をtrueにしないと$dataが連想配列にならない
+        if ($data['label_name']) {
+            $response['labelId']=createLabel($db, $data);;
+        }
     } elseif ($_POST['removeLabel']) {
+    }elseif ($_POST['addLabel']) {
+      $data=json_decode($_POST['addLabel'], true);//第2引数をtrueにしないと$dataが連想配列にならない
+      addLabel($db,$data);  
+    }elseif ($_POST['removeLabelLink']) {
+      $data=json_decode($_POST['removeLabelLink'], true);//第2引数をtrueにしないと$dataが連想配列にならない
+      removeLabelLink($db,$data);  
     }
 } catch (PDOException $e) {
     http_response_code(404);
@@ -55,7 +62,9 @@ function update($db, $data)
 function remove($db, $data)
 {
     $stt = $db->prepare('DELETE FROM memo WHERE id=:id');
-    
+    $stt->bindValue(':id', $data['id']);
+        $stt->execute();
+    $stt = $db->prepare('DELETE FROM label_middle WHERE memo_id=:id');
     $stt->bindValue(':id', $data['id']);
     $stt->execute();
 }
@@ -76,7 +85,6 @@ function create($db, $data)
 function createLabel($db, $data)
 {
     $stt = $db->prepare('INSERT INTO label (name) VALUES(:name)');
-
     $stt->bindValue(':name', $data['label_name']);
     $stt->execute();
     $lastId=$db->lastInsertId();
@@ -88,11 +96,20 @@ function createLabel($db, $data)
     $stt->execute();
     return $lastId;
 }
-
-function linkMemoTolabel($db, $data)
-{
+function addLabel($db,$data){
+  $stt = $db->prepare('INSERT INTO label_middle (label_id,memo_id) VALUES(:label_id,:memo_id)');
+  $stt->bindValue(':label_id', $data['label_id']);
+  $stt->bindValue(':memo_id', $data['memo_id']);
+  $stt->execute();
+  
 }
+function removeLabelLink($db,$data){
+  $stt = $db->prepare(' DELETE FROM label_middle WHERE label_id=:label_id AND memo_id=:memo_id');
+  $stt->bindValue(':label_id', $data['label_id']);
+  $stt->bindValue(':memo_id', $data['memo_id']);
+  $stt->execute();
 
+}
 function check($data)
 {
     if ($data['title']=='' && $data['contents']=='') {

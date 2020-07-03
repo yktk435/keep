@@ -41,13 +41,15 @@ function keyUp(obj) {
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  keyUp終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
 }
 
-document.addEventListener('click', (e) => { //書き換えるとコンフリクトデータになる
+document.addEventListener('click', (e) => { //新規メモ追加の際、外側をクリックしたら保存（コンフリクトのため）
+
   if (!e.target.closest('#' + CREATE)) {
     if (FLAG) { //すでに新規作成済みなら
       updateNewMemo();
       //新規メモ入力箇所を初期化
       newMemoData.newNode.style.display = "inline-block"
       let target = document.getElementById(CREATE);
+      let label = document.querySelector('#'+CREATE+'.label-area');
       target.children[0].innerText = '';
       target.children[1].innerText = '';
       target.setAttribute('color_id', 'def');
@@ -55,6 +57,7 @@ document.addEventListener('click', (e) => { //書き換えるとコンフリク�
       target.setAttribute('label_id', '');
       target.setAttribute('color_id', '');
       target.setAttribute('user_id', '');
+      label.innerHTML=''
       FLAG = 0;
     }
   }
@@ -63,13 +66,24 @@ document.addEventListener('click', (e) => { //書き換えるとコンフリク�
 //新規メモ作成
 /*******************************************/
 function updateNewMemo() { //
+
   let data = {}
   let target = document.getElementById(CREATE)
+  let targetlabelList = document.querySelector('#'+CREATE + '.label-area')
+  
   //DB送信用データの作成
   data = idToData(CREATE);
   data.id = createdId;
-
+  let  newlabelList = document.querySelector('#id_'+createdId+'.label-area')
+  
   postData(url, 'update', data);
+  //めもIDとラベルIDをlabel_middleへ登録
+  Object.assign(data,{'memo_id':createdId})
+  let labelIdandName=Array.from(targetlabelList.children);
+  labelIdandName.forEach((i)=>{
+    Object.assign(data,{'label_id':i.getAttribute('label_id')});
+    postData(url,'addLabel',data)
+  });
 
   //非表示になっている新規作成メモへ反映
   newMemoData.newNode.id = 'id_' + createdId;
@@ -79,11 +93,15 @@ function updateNewMemo() { //
   newMemoData.newNode.setAttribute('label_id', target.getAttribute('label_id'));
   newMemoData.newNode.setAttribute('color_id', target.getAttribute('color_id'));
   newMemoData.newNode.setAttribute('user_id', target.getAttribute('user_id'));
+  newlabelList.innerHTML=targetlabelList.innerHTML;
+
+
 }
 /*******************************************/
 //新規メモ要素作成
 /*******************************************/
 function createEl(id) {
+  console.log("id===============" + id)
   let parentNode = document.querySelector('.memo_area');
   newMemoData.newNode = document.createElement('div');
   let referenceNode = document.querySelector('.memo');
@@ -101,12 +119,17 @@ function createEl(id) {
   </div>
   <div contenteditable="true" class="textArea"  onkeyup="keyUp(this)">${target.children[1].innerText}
   </div>
+  <div id="id_${id}" class="label-area">ラベル
+
+
+  </div>
+
     <div class="">
-      <button type="button" name="button" onclick=remove(this)>削除_${id}</button>
+      <button type="button" name="button" onclick=removeObj(this)>削除_${id}</button>
     </div>
     <div class="other_menu">
       <ul class="gnav">
-        <li>カラー <span>▼</span>
+        <li>カラー 
           <ul id="id_${id}">
             <li id="def" onclick=changeColor(this)>def</li>
             <li id="red" onclick=changeColor(this)>赤</li>
@@ -114,11 +137,9 @@ function createEl(id) {
             <li id="yellow" onclick=changeColor(this)>黄</li>
           </ul>
         </li>
-        <li>ラベル<span>▼</span>
-          <ul>
-            <li>ラベル1</li>
-            <li>ラベル1</li>
-          </ul>
+        <li id="id_${id}" class="label-menu">ラベル
+
+
         </li>
       </ul>
     </div>
@@ -131,7 +152,7 @@ function createEl(id) {
 /*******************************************/
 //メモ削除
 /*******************************************/
-function remove(obj) {
+function removeObj(obj) {
   let target = obj.parentNode.parentNode;
   let id = target.id; //メモID
   let memoArea = document.querySelector('.memo_area');
@@ -190,8 +211,9 @@ function postData(url, key, data) {
           createEl(res.data);
           break;
         case 'createLabel':
-          console.log(res.labelId)
-          createLabelEl(res.labelId, data.label_name)
+
+          createLabelEltoMenu(res.labelId, data.label_name);
+          createLabel('id_' + data.memo_id, res.labelId, data.label_name);
           break;
         default:
 
@@ -261,30 +283,33 @@ function changeColor(obj) {
 //ラベル
 /*******************************************/
 function setLabel(obj) {
-
   let memoId = obj.parentNode.id;
+  //console.log(memoId)
   let labelId = obj.getAttribute('label_id');
   let labelName = obj.innerText;
   let labelStatus = obj.getAttribute('label-status');
   let parentNode = document.getElementById(memoId);
   let getAttribute = parentNode.getAttribute('label_id')
-
-
-  if (labelStatus == 'true') {
-    console.log('消す')
-    removeLabel(memoId, labelId);
-    obj.setAttribute('label-status', 'false')
-    //label_idへ反映
-    parentNode.setAttribute('label_id', replaveLabelId(getAttribute, labelId))
-  } else {
-    createLabel(memoId, labelId, labelName);
-    console.log('表示')
-    obj.setAttribute('label-status', 'true')
-    //label_idへ反映
-    parentNode.setAttribute('label_id', getAttribute + ' ' + labelId)
+  let data = {
+    'label_id': labelId,
+    'memo_id': toId(memoId),
   }
-  postData(url, 'update', idToData(toId(memoId)));
+  let lavelList = Array.from(document.querySelector('#' + memoId + '.label-area').children);
+  // 
 
+  try {
+    lavelList.forEach((i) => {
+      if (labelId == i.getAttribute('label_id')) {
+        console.log('消す')
+        i.remove();
+        postData(url, 'removeLabelLink', data);
+        throw new Error('表示へ');
+      }
+    })
+    console.log('表示')
+    createLabel(memoId, labelId, labelName);
+    postData(url, 'addLabel', data);
+  } catch (e) {}
 }
 
 function replaveLabelId(label_id, labelId) {
@@ -314,7 +339,7 @@ function createLabel(memoId, labelId, labelName) {
 
 function removeLabel(memoId, labelId) {
   console.log('ラベル消す')
-  let target = document.querySelector('div#' + memoId + ' [label_id="' + labelId + '"]');
+  let target = document.querySelector('div#' + memoId + '.label-area [label_id="' + labelId + '"]');
   target.remove();
 }
 /*******************************************/
@@ -331,51 +356,91 @@ function getDatetime(now) {
 }
 //ラベル名を入力してエンターを押したらラベルテーブルとラベル中カンテ-ブルへ登録する
 function addLabel(code, obj) {
-  let memoId = toId(obj.id);
+
+  let target = obj.parentNode.parentNode;
+  let memoId = toId(target.id);
   let labelName = obj.value;
   let data = {
     'label_name': labelName,
     'memo_id': memoId,
   }
-  //エンターキー押下なら
-  if (13 === code) {
-    if (labelName == '') {
-      return false;
-    } else {
-      console.log(data)
-      //ラベルエーブルへの登録とラベル中間テーブルへの登録
-      postData(url, 'createLabel', data);
-    }
+  let t = Array.from(document.querySelector("div.aaaa").children)
 
+  //エンターキー押下なら
+  if (13 === code && labelName != '') {
+    try {
+      t.forEach(item => {
+        if (labelName == item.innerText) {
+          item.click();
+          throw new Error('終了します');
+        }
+      });
+      //ラベルテーブルへの登録とラベル中間テーブルへの登録
+      postData(url, 'createLabel', data);
+    } catch (e) {
+      console.log(e);
+    }
     //ページ上のラベルのところに表示させる要素を作成する。
     obj.value = '';
   }
 }
 
-function createLabelEl(labelId, labelName) {
-  let parentNode = document.querySelectorAll('.label-parent');
-  let newNode = document.createElement('li');
-  let referenceNode = document.querySelector('.memo');
+
+
+function createLabelEltoMenu(labelId, labelName) {
+  let parentNode = document.querySelectorAll('.aaaa');
+  let newNode = document.createElement('div');
+  //let referenceNode = document.querySelector('.memo');
 
   //newNode.className = ;
-  newNode.onkeypress = "setLabel(this)";
+  newNode.onclick = "setLabel(this)";
   newNode.setAttribute('label_id', labelId)
   newNode.setAttribute('label-status', 'true')
+  newNode.setAttribute('onclick', 'setLabel(this)')
+  newNode.style = "border: 1px solid #d5d2d2;";
 
   newNode.innerHTML = labelName;
-  // parentNode.forEach((e)=>{
-  //   e.appendChild(newNode);
-  // });
-  let g = Array.from(parentNode);
-  let gs;
-  console.log(g);
-  for (let i = 0; i < g.length; i++) {
-    console.log(g[i])
-    gs = g[i].appendChild(newNode);
-  }
+  parentNode.forEach((e) => {
+    e.appendChild(newNode);
+  });
+  // let g = Array.from(parentNode);
+  // let gs;
+  // console.log(g);
+  // for (let i = 0; i < g.length; i++) {
+  //   console.log(g[i])
+  //   gs = g[i].appendChild(newNode);
+  // }
   //parentNode.appendChild(newNode);
 }
 
-function linkMemoTolabel(url, memoId, labelId) {
+window.onmouseout = function(e) {
 
+  let subMenu = document.querySelector('.aaaa');
+  let subTop = subMenu.getBoundingClientRect().top;
+  let subLeft = subMenu.getBoundingClientRect().left;
+  let subHeight = subMenu.getBoundingClientRect().height;
+  let memoId;
+  //console.log(e.toElement)
+  if (e && e.toElement.className.match(/label-menu/)) { //クラス名がlabel-menuだったら
+    memoId = e.toElement.id;
+    if (memoId != '') {
+      subMenu.id = memoId;
+    }
+
+
+    let li = e.toElement.getBoundingClientRect()
+    // console.log('li=top=' + li.top);
+    // console.log('li=left=' + li.left);
+    // console.log('li=height=' + li.height);
+
+    subMenu.style.top = String(li.top + li.height - 5) + "px";
+    subMenu.style.left = li.left + "px";
+  } else if (e && (e.target.className.match(/aaaa/) || e.target.parentNode.className.match(/aaaa/) || e.toElement.className.match(/aaaa/) || e.toElement.parentNode.className.match(/aaaa/))) {
+    //継続
+  } else {
+    subMenu.style.top = "-9999px";
+    subMenu.style.left = "0px";
+    subMenu.id = '';
+
+  }
 }
