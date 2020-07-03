@@ -40,7 +40,9 @@ function keyUp(obj) {
   }, 500);
   console.log('▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲  keyUp終わり  ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲')
 }
+
 document.addEventListener('click', (e) => { //新規メモ追加の際、外側をクリックしたら保存（コンフリクトのため）
+
   if (!e.target.closest('#' + CREATE)) {
     if (FLAG) { //すでに新規作成済みなら
       updateNewMemo();
