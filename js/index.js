@@ -310,17 +310,6 @@ function setLabel(obj) {
   } catch (e) {}
 }
 
-function replaveLabelId(label_id, labelId) {
-  let arr = label_id.split(' ');
-  arr = arr.filter(function(a) { //labelIdを消す
-    return a !== labelId;
-  });
-  arr = arr.filter(v => v); //配列内の空白を消す
-
-  console.log(arr.join(' '));
-  return arr.join(' '); //配列を文字列にする
-
-}
 /*******************************************/
 //ラベル作成 削除
 /*******************************************/
