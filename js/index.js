@@ -8,6 +8,7 @@ class Memo {
     this.contents = contents;
     this.datetime = new Date();
     this.labelName = {}
+    this.allLabel={}
     this.color = 'def';
     this.userId = 1;
     this.api = new ApiManager()
@@ -15,23 +16,24 @@ class Memo {
 
   createDivTag() {
     let div = document.createElement("div");
+    let templete='';
     div.id = 'id_' + this.id
     div.className = "memo share";
     div.setAttribute('color_id', this.color)
 
-    div.innerHTML = `
+    templete = `
     <div contenteditable="true" class="textArea" >${this.title}</div>
     <div contenteditable="true" class="textArea" >${this.contents}</div>
     <div id="id_${this.id}" class="label-area">
     `;
 
     Object.keys(this.labelName).forEach((key) => {
-      div.innerHTML += `
+      templete += `
       <div label_id="${key}" class="label">${this.labelName[key]}</div>
       `;
     })
 
-    div.innerHTML += `
+    templete += `
     <div class="">
       <button type="button" name="button" >削除_${this.id}</button>
     </div>
@@ -45,17 +47,31 @@ class Memo {
             <li id="yellow"  >黄</li>
           </ul>
         </li>
-        <li id="id_${this.id}" class="label-menu">ラベル
+        <li id="id_${this.id}" >ラベル
+        <ul class="label-menu">
+        `;
+    Object.keys(this.allLabel).forEach((key) => {
+      templete += `<li label_id=${key}>${this.allLabel[key]}</li>`;
+    })
+    templete += `
+        </ul>
         </li>
       </ul>
     </div>
     `;
+    div.innerHTML=templete;
 
+    //***************************************************//
+    //addEventListenerの設定
+    //***************************************************//
     Array.from(div.childNodes).forEach((e) => {
       if (e.nodeName && e.nodeName != '#text') {
 
+
         if (e.querySelector('.label-color')) {
+
           let target = e.querySelector('.label-color');
+
           //色をクリック
           target.addEventListener('click', function(event) {
             //console.log(this) //このときすでに this.color = event.target.id; が実行されている。。。。。。。？？
@@ -63,11 +79,32 @@ class Memo {
             this.color = event.target.id;
             this.api.updateMemo(this)
           }.bind(this))
-        } else if (e.querySelector('button')) { //削除ボタン
+        }
+        if (e.querySelector('button')) { //削除ボタン
           let button = e.querySelector('button')
           button.addEventListener('click', function(event) {
             this.removeDivTag(div);
+
           }.bind(this))
+        }
+        if (e.querySelector('.label-menu')) {
+           let li = e.querySelector('.label-menu').children
+           let labelId;
+           Object.keys(li).forEach((key)=>{
+             li[key].addEventListener('click',function(event){
+               labelId=li[key].getAttribute('label_id')
+               
+               if(Object.keys(this.labelName).indexOf(labelId)){
+                 this.labelName=Object.assign(this.labelName,{[labelId]:li[key].innerText})                  
+                 
+               }else{//すでにそのラベルが付いてるなら
+                 //ラベル削除
+                 delete this.labelName[labelId]
+               }
+               console.log(this)
+               
+             }.bind(this))
+           })
         }
       }
     })
@@ -198,7 +235,7 @@ class ApiManager {
     console.log(memoId)
     this.fetchAllData('remove', {
       id: memoId
-    }).then(function(json){
+    }).then(function(json) {
       console.log(json)
       json = JSON.parse(json)
       console.log(json)
@@ -225,11 +262,10 @@ class ApiManager {
 }
 
 window.onload = function() {
-  // for (let i = 0; i < 10; i++) {
-  //   let memo = new Memo();
-  //   memo.id = i;
-  //   document.querySelector(".memo_area").appendChild(memo.createDivTag());
-  // }
+  let subMenu = document.querySelector('.aaaa');
+  subMenu.addEventListener('mouseover', function() {
+    console.log('ddsad')
+  })
 
   let api = new ApiManager();
   let memoObj = {}
@@ -240,16 +276,20 @@ window.onload = function() {
     // console.log(res)
     let resMemo = res.memo
     let resLabel = res.label
+    console.log(resLabel)
     let resLabelMiddle = res.labelMiddle
+    console.log(resLabelMiddle)
     label = new LabelMiddle(resLabel, resLabelMiddle)
-    console.log(label.getLabelName('921'))
+    //console.log(label.getLabelName('921'))
     resMemo.forEach(e => {
       let memo = new Memo(e.title, e.contents);
 
       memo.id = e.id;
       memo.datetime = e.datetime;
       memo.color = e.color_id;
+      memo.allLabel=res.label
       memo.labelName = label.getLabelName(memo.id)
+      console.log(memo.labelName)
 
       document.querySelector(".memo_area").appendChild(memo.createDivTag());
 
@@ -258,36 +298,4 @@ window.onload = function() {
       })
     })
   })
-}
-
-window.onmouseout = function(e) {
-
-  let subMenu = document.querySelector('.aaaa');
-  let subTop = subMenu.getBoundingClientRect().top;
-  let subLeft = subMenu.getBoundingClientRect().left;
-  let subHeight = subMenu.getBoundingClientRect().height;
-  let memoId;
-  //console.log(e.toElement)
-  if (e && e.toElement.className.match(/label-menu/)) { //クラス名がlabel-menuだったら
-    memoId = e.toElement.id;
-    if (memoId != '') {
-      subMenu.id = memoId;
-    }
-
-
-    let li = e.toElement.getBoundingClientRect()
-    // console.log('li=top=' + li.top);
-    // console.log('li=left=' + li.left);
-    // console.log('li=height=' + li.height);
-
-    subMenu.style.top = String(li.top + li.height - 5) + "px";
-    subMenu.style.left = li.left + "px";
-  } else if (e && (e.target.className.match(/aaaa/) || e.target.parentNode.className.match(/aaaa/) || e.toElement.className.match(/aaaa/) || e.toElement.parentNode.className.match(/aaaa/))) {
-    //継続
-  } else {
-    subMenu.style.top = "-9999px";
-    subMenu.style.left = "0px";
-    subMenu.id = '';
-
-  }
 }
