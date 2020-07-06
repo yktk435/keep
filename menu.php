@@ -64,8 +64,8 @@ try {
 
   <div id="create" class="add_memo share" datetime="" label_id="" user_id="" color_id="def">
 
-    <div contenteditable="true" class="textArea" onkeyup="keyUp(this)"></div>
-    <div contenteditable="true" class="textArea" onkeyup="keyUp(this)"></div>
+    <div id='title' contenteditable="true" class="textArea" onkeyup="keyUp(this)"></div>
+    <div id='contents' contenteditable="true" class="textArea" onkeyup="keyUp(this)"></div>
     <div id="create" class="label-area">
       
     </div>
@@ -91,6 +91,7 @@ try {
   <!-- メモ -->
   <div class="memo_area">
     <?php
+    /*
     if ($res) {
         foreach ($res as $value) {
             $msg=<<<EOD
@@ -148,7 +149,7 @@ try {
         print "<dialog>".$db->lastInsertId()."</dialog>";
     }
     
-    ?>
+*/    ?>
 
   </div>
 </body>

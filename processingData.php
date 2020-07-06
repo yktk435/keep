@@ -6,13 +6,16 @@ try {
     if ($_POST['update']) {
         $data=json_decode($_POST['update'], true);//第2引数をtrueにしないと$dataが連想配列にならない
         check($data);
-        update($db, $data);
+        
         $response['data']='update';
+        $response['postData']=$data;
+        $response['error']=update($db, $data);
     } elseif ($_POST['remove']) {
         $data=json_decode($_POST['remove'], true);//第2引数をtrueにしないと$dataが連想配列にならない
-        check($data);
+        //check($data);
         remove($db, $data);
         $response['data']='remove';
+        
     } elseif ($_POST['create']) {
         $data=json_decode($_POST['create'], true);//第2引数をtrueにしないと$dataが連想配列にならない
         check($data);
@@ -83,6 +86,7 @@ function update($db, $data)
     $stt->bindValue(':color_id', $data['color_id']);
     $stt->bindValue(':user_id', (int)$data['user_id']);
     $stt->execute();
+    return $stt->errorInfo();
 }
 
 function remove($db, $data)
