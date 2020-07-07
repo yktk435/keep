@@ -10,9 +10,12 @@ try {
     
     $stt = $db->prepare('SELECT memo_id,label_id FROM label_middle');
     $stt->execute();
-    $memoIdlabelIdRes=$row=$stt->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_GROUP);
+    
+    $labelMiddle=$row=$stt->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_GROUP);
+    
     $stt = $db->prepare('SELECT * FROM label');
     $stt->execute();
+    
     while ($row=$stt->fetchAll(PDO::FETCH_COLUMN | PDO::FETCH_UNIQUE)) {
         $labelData=$row;
     }
@@ -105,8 +108,8 @@ try {
          <div id="id_{$value['id']}" class="label-area">
          EOD;
          
-            if ($memoIdlabelIdRes) {
-                foreach ((array)$memoIdlabelIdRes[$value['id']] as $labelId) {
+            if ($ labelMiddle) {
+                foreach ((array)$ labelMiddle[$value['id']] as $labelId) {
                     $msg.=<<<EOD
                <div label_id="{$labelId}" class="label">{$labelData[$labelId]}</div>
                EOD;

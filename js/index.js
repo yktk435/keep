@@ -49,6 +49,8 @@ class Memo {
         </li>
         <li id="id_${this.id}" >ラベル
         <ul class="label-menu">
+        <li><input type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" onkeypress="addLabel(event.keyCode,this);"></li>
+        
         `;
     Object.keys(this.allLabel).forEach((key) => {
       templete += `<li label_id=${key}>${this.allLabel[key]}</li>`;
@@ -87,24 +89,30 @@ class Memo {
 
           }.bind(this))
         }
-        if (e.querySelector('.label-menu')) {
+        if (e.querySelector('.label-menu')) {//ラベルをクリックしたとき
            let li = e.querySelector('.label-menu').children
            let labelId;
            Object.keys(li).forEach((key)=>{
              li[key].addEventListener('click',function(event){
                labelId=li[key].getAttribute('label_id')
                
-               if(Object.keys(this.labelName).indexOf(labelId)){
+               if(!Object.keys(this.labelName).find(item => item === labelId)){
+                 console.log('そのまま')
+                 console.log(Object.keys(this.labelName))
                  this.labelName=Object.assign(this.labelName,{[labelId]:li[key].innerText})                  
-                 
+                 console.log('そのまま')
                }else{//すでにそのラベルが付いてるなら
                  //ラベル削除
+                 console.log(this.labelName)
+                 console.log(labelId)
                  delete this.labelName[labelId]
                }
-               console.log(this)
+               console.log(this.labelName)
+               this.api.updateMemo(this)
                
              }.bind(this))
            })
+           
         }
       }
     })
@@ -209,7 +217,7 @@ class ApiManager {
     return fetch(this.url, {
         method: "POST", // *GET, POST, PUT, DELETE, etc.
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
         },
         body: '&' + key + '=' + JSON.stringify(postData),
       })
@@ -251,7 +259,8 @@ class ApiManager {
       datetime: this.toDatetime(new Date()),
       color_id: memo.color,
       label_id: 1,
-      user_id: 1
+      user_id: 1,
+      labelName:memo.labelName
     })
     this.fetchAllData('update', this.postData).then(function(json) {
       console.log(json)
@@ -273,7 +282,7 @@ window.onload = function() {
   api.fetchAllData().then(function(json) {
     console.log(json)
     let res = JSON.parse(json);
-    // console.log(res)
+    console.log(res)
     let resMemo = res.memo
     let resLabel = res.label
     console.log(resLabel)
@@ -288,6 +297,7 @@ window.onload = function() {
       memo.datetime = e.datetime;
       memo.color = e.color_id;
       memo.allLabel=res.label
+      console.log(memo.allLabel)
       memo.labelName = label.getLabelName(memo.id)
       console.log(memo.labelName)
 
