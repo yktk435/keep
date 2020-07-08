@@ -39,7 +39,7 @@ try {
 </head>
 
 <body>
-<div id="" class="aaaa" style="padding: 5px;display:inline-block;position: fixed;background-color:rgb(73, 73, 73);top:-999px;left:-999px;">
+<div id="" class="aaaaa" style="padding: 5px;display:inline-block;position: fixed;background-color:rgb(73, 73, 73);top:-999px;left:-999px;">
   <div  class="">
     <input type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" onkeypress="addLabel(event.keyCode,this);">
   </div>

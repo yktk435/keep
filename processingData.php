@@ -61,6 +61,7 @@ try {
         $response['memo']=$res;
         $response['labelMiddle']=$memoIdlabelIdRes;
         $response['label']=$labelData;
+        
 
     } else {
         print 'NG';
@@ -127,7 +128,7 @@ function update($db, $data, $labelMiddle)
                 removeLabelLink($db, $data['id'], $value);
             }
         } else {
-            print_r($sended);
+            
             foreach ($sended as $value) {
                 addLabel($db, $data['id'], $value);
             }
