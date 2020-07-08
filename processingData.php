@@ -30,6 +30,12 @@ try {
             $response['labelId']=createLabel($db, $data);
             ;
         }
+    }elseif ($_POST['createOnlyLabel']) {
+        $data=json_decode($_POST['createOnlyLabel'], true);//第2引数をtrueにしないと$dataが連想配列にならない
+        if ($data['label_name']) {
+            $response['labelId']=createOnlyLabel($db, $data);
+            ;
+        }
     } elseif ($_POST['test']) {
         $data=json_decode($_POST['addLabel'], true);//第2引数をtrueにしないと$dataが連想配列にならない
         //print_r($data);
@@ -65,6 +71,7 @@ try {
     } else {
         print 'NG';
     }
+    print json_encode($response);
 } catch (PDOException $e) {
     http_response_code(404);
     $response['data']=$e->getMessage();
@@ -75,7 +82,7 @@ try {
     print json_encode($response);
 } finally {
     $_POST=[];
-    print json_encode($response);
+    
 }
 
 function labelMiddle($db)
@@ -127,7 +134,7 @@ function update($db, $data, $labelMiddle)
                 removeLabelLink($db, $data['id'], $value);
             }
         } else {
-            print_r($sended);
+            
             foreach ($sended as $value) {
                 addLabel($db, $data['id'], $value);
             }
@@ -194,6 +201,15 @@ function createLabel($db, $data)
     $stt->bindValue(':memo_id', $data['memo_id']);
     $stt->bindValue(':label_id', $lastId);
     $stt->execute();
+    return $lastId;
+}
+function createOnlyLabel($db, $data)
+{
+    $stt = $db->prepare('INSERT INTO label (name) VALUES(:name)');
+    $stt->bindValue(':name', $data['label_name']);
+    $stt->execute();
+    $lastId=$db->lastInsertId();
+    
     return $lastId;
 }
 function addLabel($db, $memoId, $labelId)

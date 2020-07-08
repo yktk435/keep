@@ -60,11 +60,12 @@ try {
 ?>
 
 </div>
+
   <div class="menu">
     メニュー
   </div>
   <!-- メモ追加 -->
-
+  <!--
   <div id="create" class="add_memo share" datetime="" label_id="" user_id="" color_id="def">
 
     <div id='title' contenteditable="true" class="textArea" onkeyup="keyUp(this)"></div>
@@ -90,7 +91,7 @@ try {
     </div>
 
   </div>
-
+-->
   <!-- メモ -->
   <div class="memo_area">
     <?php
