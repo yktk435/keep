@@ -48,7 +48,7 @@ try {
         $data=json_decode($_POST['removeLabelLink'], true);//第2引数をtrueにしないと$dataが連想配列にならない
         removeLabelLink($db, $data);
     } elseif ($_POST['get']) {
-        $stt = $db->prepare('SELECT * FROM memo ORDER BY id DESC');
+        $stt = $db->prepare('SELECT * FROM memo');
         $stt->execute();
         while ($row=$stt->fetch(PDO::FETCH_ASSOC)) {
             $res[]=$row;

@@ -155,12 +155,28 @@ class NewMemo {
       }
     })
 
-    div.querySelector('.textArea').addEventListener('keyup', function() {
+    div.querySelector('#title').addEventListener('keyup', function() {
       let title=div.querySelector('#title').innerText
       let contents=div.querySelector('#contents').innerText
       this.title = title
       this.contents = contents
-      // console.log(this)
+      console.log(contents)
+      
+      if(this.id==0){
+        // console.log(this)
+        this.api.createMemo(this).then(function(json) {
+          this.id=json.data
+        }.bind(this))
+      }else if(title=='' && contents==''){
+        this.api.deleteMemo(this.id)
+      }
+    }.bind(this))
+    div.querySelector('#contents').addEventListener('keyup', function() {
+      let title=div.querySelector('#title').innerText
+      let contents=div.querySelector('#contents').innerText
+      this.title = title
+      this.contents = contents
+      console.log(contents)
       
       if(this.id==0){
         // console.log(this)
@@ -173,7 +189,7 @@ class NewMemo {
     }.bind(this))
     
      document.addEventListener('click',function(e){
-       // console.log(this)
+       
        //タイトルと内容が空でない状態で、新規メモ以外をクリックしたとき
        if(!e.target.closest('.add_memo.share') && (div.querySelector('#title').innerText!='' || div.querySelector('#contents').innerText!='')){
           div.querySelector('#title').innerText=''
@@ -188,8 +204,9 @@ class NewMemo {
          this.id=0;
          div.querySelector('ul.label-menu').innerHTML=''
          div.querySelector('.label-area').innerHTML=''
-         let parent=document.querySelector(".memo_area")
-         parent.insertBefore(this.obj.createDivTag(),parent.childNodes[0]);
+         
+         
+         this.obj.createDivTag()
        }
       
     }.bind(this))
@@ -399,10 +416,25 @@ class Memo {
     div.addEventListener('keyup', function(e) {
       this.title = div.children[0].innerText
       this.contents = div.children[1].innerText
-      // console.log(this)
+      console.log('≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥≥')
+      console.log(div.children[1].innerText)
+      console.log(this)
       this.api.updateMemo(this)
     }.bind(this));
-    return div;
+    //return div;
+    
+    let parent=document.querySelector(".memo_area")
+    let ref
+    if(parent.children[0]){
+      
+      ref=parent.children[0]
+    parent.insertBefore(div,ref)  
+    }else{
+      
+      parent.appendChild(div)  
+    }
+    
+    
   }
   updateDivTag() {
     let div = document.querySelector('#id_' + this.id);
@@ -551,7 +583,7 @@ window.onload = function() {
       memo.labelName = label.getLabelName(memo.id)
       // console.log(memo.labelName)
 
-      document.querySelector(".memo_area").appendChild(memo.createDivTag());
+      memo.createDivTag();
 
       memoObj = Object.assign(memoObj, {
         [e.id]: memo
