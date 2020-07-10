@@ -130,6 +130,9 @@ function update($db, $data, $labelMiddle)
 
     if (empty($sended) || empty($labelMiddle[$data['id']])) {//送信されてくるラベルが0ならすべて消す。
         if (empty($sended)) {
+          print 'aaa';
+          var_dump($data['id']);
+          print_r($labelMiddle);
             foreach ($labelMiddle[$data['id']] as $value) {
                 removeLabelLink($db, $data['id'], $value);
             }
