@@ -7,19 +7,22 @@ class Memo {
     this.contents = contents;
     this.datetime = new Date();
     this.labelName = {}
-    this.allLabel = {}
+    this.labelList = {}
     this.color = 'def';
     this.userId = 1;
     this.api = new ApiManager()
-    this.labelMenuPosition = labelMenu
+    this.labelMenu = labelMenu
+    this.div
+
   }
 
   createDivTag() {
-    let div = document.createElement("div");
+    this.div = document.createElement("div");
     let template = '';
-    div.id = 'id_' + this.id
-    div.className = "memo share";
-    div.setAttribute('color_id', this.color)
+    this.div.id = 'id_' + this.id
+    this.div.className = "memo share";
+    this.div.setAttribute('color_id', this.color)
+
 
     template = `
 <div contenteditable="true" class="textArea" >${this.title}</div>
@@ -33,38 +36,6 @@ class Memo {
 `;
     })
 
-    //     template += `
-    // </div>
-    // <div class="">
-    // <button type="button" name="button" >削除_${this.id}</button>
-    // </div>
-    // <div class="other_menu">
-    // <ul class="gnav">
-    // <li>カラー 
-    // <ul id="id_${this.id}" class="label-color">
-    // <li id="def"  >def</li>
-    // <li id="red"  >赤</li>
-    // <li id="blue"  >青</li>
-    // <li id="yellow"  >黄</li>
-    // </ul>
-    // </li>
-    // <li id="id_${this.id}" class="label-hover">ラベル
-    // <ul class="label-menu">
-    // <li><input type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" ;"></li>
-    // 
-    // `;
-    //     if (this.allLabel != null) {
-    //       Object.keys(this.allLabel).forEach((key) => {
-    //         template += `<li label_id=${key}>${this.allLabel[key]}</li>`;
-    //       })
-    //     }
-    // 
-    //     template += `
-    // </ul>
-    // </li>
-    // </ul>
-    // 
-    // `;
 
     template += `
 </div>
@@ -87,12 +58,13 @@ class Memo {
 
  `;
 
-    div.innerHTML = template;
+    this.div.innerHTML = template;
+
 
     //***************************************************//
     //addEventListenerの設定
     //***************************************************//
-    Array.from(div.childNodes).forEach((e) => {
+    Array.from(this.div.childNodes).forEach((e) => {
       if (e.nodeName && e.nodeName != '#text') {
         if (e.querySelector('.label-color')) {
           let target = e.querySelector('.label-color');
@@ -100,7 +72,7 @@ class Memo {
           //色をクリック
           target.addEventListener('click', function(event) {
             //console.log(this) //このときすでに this.color = event.target.id; が実行されている。。。。。。。？？
-            div.setAttribute('color_id', event.target.id)
+            this.div.setAttribute('color_id', event.target.id)
             this.color = event.target.id;
             this.api.updateMemo(this)
           }.bind(this))
@@ -109,147 +81,16 @@ class Memo {
           let target = e.querySelector('button')
           target.addEventListener('click', function(event) {
             this.removeDivTag(div);
-
           }.bind(this))
         }
-
-        // if (e.querySelectorAll('li[label_id]')) { //ラベルメニューをクリックしたとき
-        // 
-        //   let li = e.querySelectorAll('li[label_id]')
-        //   let labelId;
-        //   Object.keys(li).forEach((key) => {
-        //     li[key].addEventListener('click', function(event) {
-        //       labelId = li[key].getAttribute('label_id')
-        //       //ラベル追加
-        //       if (!Object.keys(this.labelName).find(item => item === labelId)) {
-        //         this.labelName = Object.assign(this.labelName, {
-        //           [labelId]: li[key].innerText
-        //         })
-        //         let liTag = document.createElement('li')
-        //         liTag.setAttribute('label_id', labelId)
-        //         liTag.className = 'label';
-        //         liTag.innerText = this.allLabel[labelId]
-        // 
-        // 
-        //         div.querySelector('.label-area').appendChild(liTag)
-        //         //すでにそのラベルが付いてるならラベル削除
-        //       } else {
-        //         //ラベルエリアから要素を消す
-        //         div.querySelector('.label-area [label_id="' + labelId + '"]').remove()
-        //         //e.querySelector('[label_id="' + labelId + '"]').remove();
-        // 
-        //         delete this.labelName[labelId]
-        // 
-        //       }
-        //       // console.log(this.labelName)
-        //       this.api.updateMemo(this)
-        // 
-        //     }.bind(this))
-        // 
-        //   })
-        // 
-        // }
         if (e.querySelector('.label-hover')) {
-          let li = e.querySelector('.label-hover')
-
-
-
-          li.addEventListener('mouseover', function(event) {
-
-            let liInfo = event.target.getBoundingClientRect()
-            this.labelMenuPosition.top = String(liInfo.top + liInfo.height - 5) + "px";
-            this.labelMenuPosition.left = liInfo.left + "px";
-            this.labelMenuPosition.editingId = this.id
-            this.labelMenuPosition.move()
-
-
-          }.bind(this))
-
-          li.addEventListener('mouseout', function(event) {
-            let hover = document.querySelectorAll(':hover')
-            try {
-              Array.from(hover).forEach((el) => {
-                if (el.className == 'aaaa') {
-                  throw new Error('ラベルメニューの位置をそのままにする');
-                }
-              })
-              this.labelMenuPosition.top = "-999px";
-              this.labelMenuPosition.left = "-999px";
-              this.labelMenuPosition.editingId = ''
-              this.labelMenuPosition.move()
-
-            } catch (e) {
-
-            }
-          }.bind(this))
-        }
-        if (e.querySelector('input')) { //ラベル登録
-          let input = e.querySelector('input')
-          input.addEventListener('keypress', function(event) {
-            //エンター押したら
-            if (event.charCode == 13 && input.value != '') {
-              this.api.fetchAllData('createLabel', {
-                'label_name': input.value,
-                'memo_id': this.id,
-              }).then(function(json) {
-                json = JSON.parse(json)
-                let labelId = json.labelId
-                //メモ全体へ反映する必要がある↓
-                this.allLabel[labelId] = input.value
-                //メモ全体へ反映する必要がある↑
-                this.labelName = Object.assign(this.labelName, {
-                  [labelId]: input.value
-                })
-                //ラベルエリアに要素を追加
-                let liTag = document.createElement('li')
-                liTag.setAttribute('label_id', labelId)
-                liTag.className = 'label';
-                liTag.innerText = input.value
-                div.querySelector('.label-area').appendChild(liTag)
-                //rベルメニューへ追加
-                let liMenu = document.createElement('li')
-                liMenu.setAttribute('label_id', labelId);
-                liMenu.innerText = liTag.innerText
-                //クリックされたときの動作を設定
-                liMenu.addEventListener('click', function(event) {
-                  //ラベル追加
-                  if (!Object.keys(this.labelName).find(item => item === labelId)) {
-                    this.labelName = Object.assign(this.labelName, {
-                      [labelId]: input.value
-                    })
-                    let liTag = document.createElement('li')
-                    liTag.setAttribute('label_id', labelId)
-                    liTag.className = 'label';
-                    liTag.innerText = this.allLabel[labelId]
-                    div.querySelector('.label-area').appendChild(liTag)
-                    //すでにそのラベルが付いてるならラベル削除
-                  } else {
-                    //ラベルエリアから要素を消す
-                    div.querySelector('.label-area [label_id="' + labelId + '"]').remove()
-                    //e.querySelector('[label_id="' + labelId + '"]').remove();
-
-                    delete this.labelName[labelId]
-
-                  }
-                  // console.log(this.labelName)
-                  this.api.updateMemo(this)
-
-                }.bind(this))
-
-                div.querySelector('.label-menu').appendChild(liMenu)
-
-                input.value = '';
-
-              }.bind(this))
-            }
-          }.bind(this))
-
+          this.labelMenu.setHover(e.querySelector('.label-hover'))
         }
         if (e.querySelector('li.label')) {}
       }
     })
 
-    Array.from(this.labelMenuPosition.div.querySelectorAll('[label_id]')).forEach((e) => {
+    Array.from(this.div.querySelectorAll('[label_id]')).forEach((e) => {
 
       e.addEventListener('click', function(event) {
         let labelId = event.target.getAttribute('label_id')
@@ -262,13 +103,13 @@ class Memo {
           let liTag = document.createElement('li')
           liTag.setAttribute('label_id', labelId)
           liTag.className = 'label';
-          liTag.innerText = this.allLabel[labelId]
+          liTag.innerText = this.labelList[labelId]
 
-          div.querySelector('.label-area').appendChild(liTag)
+          this.div.querySelector('.label-area').appendChild(liTag)
           //すでにそのラベルが付いてるならラベル削除
         } else {
           //       //ラベルエリアから要素を消す
-          div.querySelector('.label-area [label_id="' + labelId + '"]').remove()
+          this.div.querySelector('.label-area [label_id="' + labelId + '"]').remove()
           //e.querySelector('[label_id="' + labelId + '"]').remove();
 
           delete this.labelName[labelId]
@@ -281,22 +122,22 @@ class Memo {
 
 
     })
-    div.addEventListener('keyup', function(e) {
-      this.title = div.children[0].innerText
-      this.contents = div.children[1].innerText
+    this.div.addEventListener('keyup', function(e) {
+      this.title = this.div.children[0].innerText
+      this.contents = this.div.children[1].innerText
       // console.log(this)
       this.api.updateMemo(this)
     }.bind(this));
-    return div;
+    return this.div;
   }
   updateDivTag() {
     let div = document.querySelector('#id_' + this.id);
-    div.children[0] = this.title
-    div.children[1] = this.contents
-    div.setAttribute('color_id', this.color)
+    this.div.children[0] = this.title
+    this.div.children[1] = this.contents
+    this.div.setAttribute('color_id', this.color)
   }
   removeDivTag(div) {
-    div.remove();
+    this.div.remove();
     this.api.deleteMemo(this.id);
   }
 }
@@ -310,111 +151,161 @@ class LabelMenu {
     this.div = document.createElement('div');
     this.hoverEl;
     this.editingId;
-
-
-
   }
   createLabeMenu(targetLabelName) {
-
+    this.div = document.createElement('div')
     this.div.className = 'aaaa'
     let template;
     this.div.style = 'padding: 5px;display:inline-block;position: fixed;background-color:rgb(73, 73, 73);top:' + this.top + ';left:' + this.left + ';';
     template = `  <div  class="">
         <input type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" >
       </div>`;
-
-    Object.keys(this.labelList).forEach((key) => {
-
-      template += `<div class="" style="border: 1px solid #d5d2d2;" label_id="${key}">
-          ${this.labelList[key]}
-        </div>`
-
-    })
+    if (this.labelList != null) {
+      Object.keys(this.labelList).forEach((key) => {
+        template += `<div class="" style="border: 1px solid #d5d2d2;" label_id="${key}">
+        ${this.labelList[key]}
+      </div>`
+      })
+    }
 
     this.div.innerHTML = template;
-
-
-    // this.div.addEventListener('mouseover',function(ev){
-    // console.log('マウスオーバー',this.top,this.left)
-
-    // }.bind(this))
-    // this.div.addEventListener('mouseout',function(ev){
-
-    // console.log('マウスアウト',this.top,this.left)
-    // if(ev.target.parentNode.className!='aaaa' || ev.target.className!='aaaa' || ev.fromElement.className!='aaaa'){  
-    //   this.top="-999px";
-    //   this.left="-999px";
-    //   this.move()          
-    // }
-
-    // }.bind(this))
     document.body.appendChild(this.div)
+    this.setAddEventListener(this.div)
+
   }
   move() {
     this.div.style.top = this.top
     this.div.style.left = this.left
   }
-  setAddEventListener(memo) {
-    let target = this.div.querySelectorAll('[label_id]')
+  setAddEventListenerToLabelTag(memo) {
     Array.from(this.div.querySelectorAll('[label_id]')).forEach((e) => {
-
-      e.addEventListener('click', this.eventListenerFunc.bind(this))
-      
+      e.addEventListener('click', this.func.bind(this), true)
     })
-
   }
-  eventListenerFunc(){
-    
-      let labelId = event.target.getAttribute('label_id')
-      let labelName = event.target.innerText
+  removeAddEventListener(memo) {
+    Array.from(this.div.querySelectorAll('[label_id]')).forEach((e) => {
+      e.removeEventListener('click', this.func.bind(this), true)
+    })
+  }
+  func(event) {
+    this.labelId = event.toElement.getAttribute('label_id')
+    this.labelName = event.toElement.innerText
+    let memo = this.memoObj[this.target]
+    console.log('aaaaaaaaaaaaa')
+    console.log(this.labelId,this.labelName,this.target)
+    //ラベル追加
+    if (!Object.keys(memo.labelName).find(item => item === this.labelId)) {
+      console.log('追加')
+      memo.labelName = Object.assign(memo.labelName, {
+        [this.labelId]: this.labelName
+      })
+      let divTag = document.createElement('div')
+      divTag.setAttribute('label_id', this.labelId)
+      divTag.className = 'label';
+      divTag.innerText = this.labelName
+      console.log(divTag)
+      memo.div.querySelector('.label-area').appendChild(divTag)
+      //すでにそのラベルが付いてるならラベル削除
+    } else {
+      console.log('消す')
+      //ラベルエリアから要素を消す
+      memo.div.querySelector('.label-area [label_id="' + this.labelId + '"]').remove()
+      //e.querySelector('[label_id="' + this.labelId + '"]').remove();
+      delete memo.labelName[this.labelId]
+    }
+    memo.api.updateMemo(memo)
+  }
+  setAddEventListener(el) {
+    let input = el.querySelector('input')
 
-      if (!Object.keys(targetLabelName).find(item => item === labelId)) {
-        targetLabelName = Object.assign(targetLabelName, {
-          [labelId]: labelName
-        })
-        let liTag = document.createElement('li')
-        liTag.setAttribute('label_id', labelId)
-        liTag.className = 'label';
-        liTag.innerText = this.allLabel[labelId]
+    input.addEventListener('keypress', function(event) {
+      //エンター押したら
+      if (event.charCode == 13 && input.value != '') {
+        console.log('as')
+        let memo = this.memoObj[this.target]
+        memo.api.fetchAllData('createLabel', {
+          'label_name': input.value,
+          'memo_id': memo.id,
+        }).then(function(json) {
+          json = JSON.parse(json)
+          this.labelId = json.labelId
 
-        div.querySelector('.label-area').appendChild(liTag)
-        //すでにそのラベルが付いてるならラベル削除
-      } else {
-        //       //ラベルエリアから要素を消す
-        div.querySelector('.label-area [label_id="' + labelId + '"]').remove()
-        //e.querySelector('[label_id="' + labelId + '"]').remove();
+          this.labelName = input.value
+          memo.labelList = Object.assign(memo.labelList, {
+            [this.labelId]: this.labelName
+          })
+          memo.labelName = Object.assign(memo.labelName, {
+            [this.labelId]: this.labelName
+          })
+          //ラベルエリアに要素を追加
+          let divTag = document.createElement('div')
+          divTag.setAttribute('label_id', this.labelId)
+          divTag.className = 'label';
+          divTag.innerText = this.labelName
+          console.log(memo.div.querySelector('.label-area'))
+          memo.div.querySelector('.label-area').appendChild(divTag)
+          //rベルメニューへ追加
+          let div = document.createElement('div')
+          div.style = 'border: 1px solid #d5d2d2;';
+          div.setAttribute('label_id', this.labelId)
+          div.innerText = this.labelName
+          this.div.appendChild(div)
 
-        delete targetLabelName[labelId]
+          //クリックされたときの動作を設定
+          this.func()
 
+          // memo.div.querySelector('.label-menu').appendChild(divTag)
+
+          input.value = '';
+
+        }.bind(this))
       }
-      console.log(this.id, targetLabelName)
-      this.api.updateMemo(this)
+    }.bind(this))
 
-    
   }
+  setHover(li) {
+    this.target;
+    li.addEventListener('mouseover', function(event) {
 
+      let liInfo = event.target.getBoundingClientRect()
+      let memo
+      this.top = String(liInfo.top + liInfo.height - 5) + "px";
+      this.left = liInfo.left + "px";
+      this.editingId = this.id
+      this.target = li.id.match(/\d+/)[0]
+      memo = this.memoObj[this.target]
+      console.log(memo)
+      this.move()
+      
+      console.log(this.flag)
+      if(!this.flag){
+        this.setAddEventListenerToLabelTag(memo)
+        this.flag=1
+      }
+    }.bind(this))
 
-  // <div id="" class="aaaa" style="padding: 5px;display:inline-block;position: fixed;background-color:rgb(73, 73, 73);top:-999px;left:-999px;">
-  //   <div  class="">
-  //     <input type="text" class="add-label" maxlength="50" placeholder="ラベル名を入力" onkeypress="addLabel(event.keyCode,this);">
-  //   </div>
-  // 
-  //   <?php
-  //   if ($labelData) {
-  //       foreach ($labelData as $labelId =>$labelName) {
-  // 
-  //           $text.=<<<EOF
-  //       <div class="" style="border: 1px solid #d5d2d2;" onclick="setLabel(this)" label_id="{$labelId}">
-  //         {$labelName}
-  //       </div>
-  //       EOF;
-  // 
-  //       }
-  //       print  $text;
-  //   }
-  // ?>
-  // 
-  // </div>
+    li.addEventListener('mouseout', function(event) {
+      let hover = document.querySelectorAll(':hover')
+      try {
+        Array.from(hover).forEach((el) => {
+          if (el.className == 'aaaa') {
+            throw new Error('ラベルメニューの位置をそのままにする');
+          }
+        })
+        this.top = "-999px";
+        this.left = "-999px";
+        this.editingId = ''
+        this.move()
+        this.removeAddEventListener(memo)
+        this.flag=0;
+      } catch (e) {}
+
+    }.bind(this))
+
+  }
+  addLabel(labelId, labelName) {
+
+  }
 }
 
 
@@ -532,7 +423,7 @@ window.onload = function() {
   api.fetchAllData().then(function(json) {
     console.log(json)
     let res = JSON.parse(json);
-    console.log(res)
+    // console.log(res)
     let resMemo = res.memo
     let resLabel = res.label
     // console.log(resLabel)
@@ -548,8 +439,11 @@ window.onload = function() {
       memo.id = e.id;
       memo.datetime = e.datetime;
       memo.color = e.color_id;
-      memo.allLabel = res.label
-      // console.log(memo.allLabel)
+      if (res.label != null) {
+        res.label = {}
+      }
+      memo.labelList = res.label
+      // console.log(memo.labelList)
       memo.labelName = label.getLabelName(memo.id)
       // console.log(memo.labelName)
 
@@ -558,6 +452,8 @@ window.onload = function() {
       memoObj = Object.assign(memoObj, {
         [e.id]: memo
       })
+
     })
+    labelMenu.memoObj = memoObj
   })
 }

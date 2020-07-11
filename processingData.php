@@ -215,6 +215,7 @@ function removeLabelLink($db, $memoId, $labelId)
 function check($data)
 {
     if ($data['title']=='' && $data['contents']=='') {
+      print_r($data);
         throw new Exception('タイトルと内容がどちらも空です。');
     }
     if ($_POST['remove']) {
